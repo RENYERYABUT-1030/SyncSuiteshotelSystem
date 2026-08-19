@@ -29,6 +29,6 @@ public class YABUT {
             "+--------------------------------------------------------------------------------+"
         );
 
-        System.out.println("burat");
+        System.out.println("Byebye na po! Salamat sa pagbisita sa aking profile.");
     }
 }
