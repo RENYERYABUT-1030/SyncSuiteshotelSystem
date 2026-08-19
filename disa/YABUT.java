@@ -1,34 +1,34 @@
-public class YABUT { 
+public class YABUT {
     public static void main(String[] args) {
-        displayProfile(); // Pagtawag sa method
+        // 1. Simple addition with literals
+        int a = 5;
+        int b = 3;
+        int sum = a + b;
+        System.out.println("5 + 3 = " + sum);  // Output: 5 + 3 = 8
+
+        // 2. Addition with user input
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
+        System.out.print("Enter first number: ");
+        double num1 = scanner.nextDouble();
+        System.out.print("Enter second number: ");
+        double num2 = scanner.nextDouble();
+        double result = num1 + num2;
+        System.out.println("Sum: " + result);
+
+        // 3. Compound assignment
+        int counter = 10;
+        counter += 5;  // Same as counter = counter + 5
+        System.out.println("Counter after += 5: " + counter);  // 15
+
+        // 4. Adding multiple values
+        int total = 1 + 2 + 3 + 4 + 5;
+        System.out.println("1+2+3+4+5 = " + total);  // 15
+
+        scanner.close();
     }
 
-    public static void displayProfile() {
-        String fullName = "RENYER N. YABUT"; 
-        int age = 19;
-        String courseAndYear = "Bachelor of Science in Information Technology                 |\n|                   (Information and Network Security Elective Track), 2nd Year";
-        String school = "University of Makati (UMak)";
-        String hobbies = "Watching Movies, Playing Video Games, and Exploring New       |\n|                   Technologies";
-        String favTech = "My favorite tech or language is java but i want to explore   |\n|                   other technologies like networking, and web development,     |\n|                   and explore things in technology world.";
-        String reasonForJava = "To build a strong foundation in programming and software     |\n|                   development and use this to systems to my business soon.";
-
-        // Isang System.out.println lamang na nakapaloob sa border
-        System.out.println(
-            "+--------------------------------------------------------------------------------+\n" +
-            "|                         DATA STRUCTURES AND ALGORITHMS                         |\n" +
-            "+--------------------------------------------------------------------------------+\n" +
-            "| Full Name:       " + fullName + "                                               |\n" +
-            "| Age:             " + age + "                                                            |\n" +
-            "| Course & Year:   " + courseAndYear + "  |\n" +
-            "| School:          " + school + "                                   |\n" +
-            "| Hobbies:         " + hobbies + "       |\n" +
-            "| Favorite Programming Language or Technology:                                   |\n" +
-            "|                   " + favTech + "     |\n" +
-            "| Reason why you want to learn Java:                                             |\n" +
-            "|                   " + reasonForJava + "     |\n" +
-            "+--------------------------------------------------------------------------------+"
-        );
-
-        System.out.println("Byebye na po! Salamat sa pagbisita sa aking profile.");
+    // 5. Reusable method for addition
+    public static int add(int x, int y) {
+        return x + y;
     }
 }
