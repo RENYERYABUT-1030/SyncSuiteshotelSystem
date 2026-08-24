@@ -1,34 +1,25 @@
-public class YABUT { 
+public class YABUT{
     public static void main(String[] args) {
-        displayProfile(); // Pagtawag sa method
-    }
-
-    public static void displayProfile() {
-        String fullName = "RENYER N. YABUT"; 
+        String fullName = "Renyer Yabut";
         int age = 19;
-        String courseAndYear = "Bachelor of Science in Information Technology                 |\n|                   (Information and Network Security Elective Track), 2nd Year";
-        String school = "University of Makati (UMak)";
-        String hobbies = "Watching Movies, Playing Video Games, and Exploring New       |\n|                   Technologies";
-        String favTech = "My favorite tech or language is java but i want to explore   |\n|                   other technologies like networking, and web development,     |\n|                   and explore things in technology world.";
-        String reasonForJava = "To build a strong foundation in programming and software     |\n|                   development and use this to systems to my business soon.";
+        String courseYearLevel = "BS Information Technology Major in Information Network Security - 2nd Year";
+        String school = "University of Makati(UMAK)";
+        String hobbies = "Partying, Video Games, Coding, and Watching Movies";
+        String favoriteTech = "Java, Web Development, Networking, Database";
+        String reasonToLearnJava = "I want to learn Java because it was the first programming language I learned back in senior high school, and it sparked my interest in technology. I want to continue building on that foundation, explore new tech stacks, and improve my skills in different areas of programming, including backend development, networking, and front-end development.";
 
-        // Isang System.out.println lamang na nakapaloob sa border
-        System.out.println(
-            "+--------------------------------------------------------------------------------+\n" +
-            "|                         DATA STRUCTURES AND ALGORITHMS                         |\n" +
-            "+--------------------------------------------------------------------------------+\n" +
-            "| Full Name:       " + fullName + "                                               |\n" +
-            "| Age:             " + age + "                                                            |\n" +
-            "| Course & Year:   " + courseAndYear + "  |\n" +
-            "| School:          " + school + "                                   |\n" +
-            "| Hobbies:         " + hobbies + "       |\n" +
-            "| Favorite Programming Language or Technology:                                   |\n" +
-            "|                   " + favTech + "     |\n" +
-            "| Reason why you want to learn Java:                                             |\n" +
-            "|                   " + reasonForJava + "     |\n" +
-            "+--------------------------------------------------------------------------------+"
-        );
-
-        System.out.println("Byebye na po! Salamat sa pagbisita sa aking profile.");
+        System.out.println("========================================");
+        System.out.println("           STUDENT INFORMATION          ");
+        System.out.println("========================================");
+        System.out.println("Full Name: " + fullName);
+        System.out.println("Age: " + age);
+        System.out.println("Course and Year Level: " + courseYearLevel);
+        System.out.println("School: " + school);
+        System.out.println("Hobbies: " + hobbies);
+        System.out.println("Favorite Programming Language/Technology: " + favoriteTech);
+        System.out.println("----------------------------------------");
+        System.out.println("Reason why I want to learn Java:");
+        System.out.println(reasonToLearnJava);
+        System.out.println("========================================");
     }
 }
