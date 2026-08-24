@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 24, 2026 at 03:46 PM
+-- Generation Time: Aug 24, 2026 at 03:55 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -74,27 +74,13 @@ CREATE TABLE `archived_bookings` (
 --
 
 CREATE TABLE `audit_log` (
-  `audit_id` int(11) NOT NULL,
-  `user_type` enum('admin','customer') NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `log_id` int(11) NOT NULL,
+  `user_type` varchar(20) NOT NULL,
+  `user_name` varchar(100) NOT NULL,
   `action` varchar(100) NOT NULL,
-  `table_affected` varchar(50) DEFAULT NULL,
-  `record_id` int(11) DEFAULT NULL,
-  `old_values` text DEFAULT NULL,
-  `new_values` text DEFAULT NULL,
-  `ip_address` varchar(45) DEFAULT NULL,
-  `action_timestamp` timestamp NOT NULL DEFAULT current_timestamp()
+  `details` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `audit_log`
---
-
-INSERT INTO `audit_log` (`audit_id`, `user_type`, `user_id`, `action`, `table_affected`, `record_id`, `old_values`, `new_values`, `ip_address`, `action_timestamp`) VALUES
-(1, 'admin', 1, 'LOGIN', NULL, NULL, NULL, NULL, '192.168.1.127', '2026-08-19 07:32:19'),
-(2, 'admin', 1, 'LOGOUT', NULL, NULL, NULL, NULL, '192.168.1.127', '2026-08-19 07:32:47'),
-(3, 'admin', 1, 'LOGIN', NULL, NULL, NULL, NULL, '192.168.1.127', '2026-08-19 07:50:18'),
-(4, 'admin', 1, 'LOGOUT', NULL, NULL, NULL, NULL, '192.168.1.127', '2026-08-19 07:50:23');
 
 -- --------------------------------------------------------
 
@@ -416,7 +402,7 @@ ALTER TABLE `archived_bookings`
 -- Indexes for table `audit_log`
 --
 ALTER TABLE `audit_log`
-  ADD PRIMARY KEY (`audit_id`);
+  ADD PRIMARY KEY (`log_id`);
 
 --
 -- Indexes for table `bookings`
@@ -501,7 +487,7 @@ ALTER TABLE `archived_bookings`
 -- AUTO_INCREMENT for table `audit_log`
 --
 ALTER TABLE `audit_log`
-  MODIFY `audit_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `bookings`
