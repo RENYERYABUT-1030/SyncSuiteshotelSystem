@@ -59,10 +59,10 @@ public class CustomerPortalFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setLayout(new BorderLayout());
 
-        // ── Header ──────────────────────────────────────────────
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(39, 0, 110));
-        headerPanel.setPreferredSize(new Dimension(900, 60));
+        // ── Header — painted hotel-at-night skyline strip ────────
+        HotelBackgroundPanel headerPanel = new HotelBackgroundPanel();
+        headerPanel.setLayout(new BorderLayout());
+        headerPanel.setPreferredSize(new Dimension(900, 70));
 
         lblWelcome = new JLabel("  Welcome!");
         lblWelcome.setFont(new Font("SansSerif", Font.BOLD, 20));
@@ -70,7 +70,7 @@ public class CustomerPortalFrame extends JFrame {
         headerPanel.add(lblWelcome, BorderLayout.WEST);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        btnPanel.setBackground(new Color(39, 0, 110));
+        btnPanel.setOpaque(false);
 
         JButton btnProfile = new JButton("👤 My Profile");
         btnProfile.setForeground(Color.WHITE);

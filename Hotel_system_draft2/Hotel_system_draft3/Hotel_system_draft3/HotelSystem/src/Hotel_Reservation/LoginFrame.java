@@ -44,8 +44,11 @@ public class LoginFrame extends JFrame {
     private void initialize() {
         frmHotelReservation = new JFrame();
         frmHotelReservation.setTitle("SYNC SUITES HOTEL - LOGIN PORTAL");
-        frmHotelReservation.getContentPane().setBackground(new Color(46, 44, 122));
-        frmHotelReservation.getContentPane().setLayout(null);
+
+        // Painted hotel-at-night backdrop (no external image files needed)
+        HotelBackgroundPanel bgPanel = new HotelBackgroundPanel();
+        bgPanel.setLayout(null);
+        frmHotelReservation.setContentPane(bgPanel);
         frmHotelReservation.setSize(520, 450);
         frmHotelReservation.setLocationRelativeTo(null);
         frmHotelReservation.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -192,6 +195,8 @@ public class LoginFrame extends JFrame {
                         "Welcome, " + currentUserName + "!", 
                         "Login Successful", JOptionPane.INFORMATION_MESSAGE);
 
+                    AuditLogger.log("Admin", currentUserName, "Login", "Admin logged in successfully");
+
                     new DashboardFrame();
                     frmHotelReservation.dispose();
                 } else {
@@ -223,6 +228,8 @@ public class LoginFrame extends JFrame {
                     JOptionPane.showMessageDialog(frmHotelReservation, 
                         "Welcome, " + currentUserName + "!", 
                         "Login Successful", JOptionPane.INFORMATION_MESSAGE);
+
+                    AuditLogger.log("Customer", currentUserName, "Login", "Customer logged in successfully");
 
                     new CustomerPortalFrame(customerId);
                     frmHotelReservation.dispose();

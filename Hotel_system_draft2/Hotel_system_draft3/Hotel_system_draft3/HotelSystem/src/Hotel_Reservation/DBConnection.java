@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class DBConnection {
 
     // Change these to match your MySQL setup
-    private static final String URL      = "jdbc:mysql://localhost:3306/hotel_system?useSSL=false&serverTimezone=UTC"; 
+    private static final String URL      = "jdbc:mysql://localhost:3306/hotel_system"; 
     private static final String USERNAME = "root";   
     private static final String PASSWORD = "";       // Add your password here if set
 

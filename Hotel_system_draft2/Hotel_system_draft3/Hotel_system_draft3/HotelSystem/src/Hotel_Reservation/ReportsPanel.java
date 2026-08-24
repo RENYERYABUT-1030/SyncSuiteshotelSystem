@@ -1026,7 +1026,8 @@ public class ReportsPanel extends JPanel {
     }
 
     /**
-     * Send receipt via SMS (placeholder for Twilio integration)
+     * Send receipt via SMS — now actually sends (via ServicesManager/TextBelt),
+     * matching the working email flow above instead of just previewing the message.
      */
     private void sendReceiptSMS(int bookingId, String phone) {
         if (phone.isEmpty()) {
@@ -1061,16 +1062,19 @@ public class ReportsPanel extends JPanel {
 
             // SMS message (shortened for SMS)
             String smsMessage = String.format(
-                "Sync Suites Hotel\nReceipt: %s\nCustomer: %s\nAmount: ₱%,.2f\nThank you for your stay!",
+                "Sync Suites Hotel\nReceipt: %s\nCustomer: %s\nAmount: PHP %,.2f\nThank you for your stay!",
                 receiptNum, customer, amount
             );
 
-            // NOTE: For actual SMS sending, integrate Twilio or other SMS API
-            // This is a placeholder showing the message that would be sent
-            JOptionPane.showMessageDialog(this, 
-                "SMS would be sent to: " + phone + "\n\nMessage:\n" + smsMessage + "\n\n" +
-                "Note: To enable real SMS, configure Twilio credentials in Settings and integrate the API.", 
-                "SMS Preview", JOptionPane.INFORMATION_MESSAGE);
+            // ACTUAL SMS SEND — reuses the same TextBelt integration already
+            // wired up in NewBookingPanel / CustomerPortalFrame via ServicesManager.
+            // sendSMSAlert() fires the HTTP call on a background thread, so this
+            // returns immediately and never freezes the UI.
+            ServicesManager.sendSMSAlert(phone, smsMessage);
+
+            JOptionPane.showMessageDialog(this,
+                "SMS sent to: " + phone + "\n\nMessage:\n" + smsMessage,
+                "SMS Sent", JOptionPane.INFORMATION_MESSAGE);
 
             // Log notification
             logNotification(bookingId, "SMS", phone, "Receipt " + receiptNum, smsMessage);

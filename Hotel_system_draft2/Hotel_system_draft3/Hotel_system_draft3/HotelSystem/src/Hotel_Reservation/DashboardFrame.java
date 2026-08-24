@@ -22,10 +22,9 @@ public class DashboardFrame extends JFrame {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
-        // Header
-        JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(new Color(39, 0, 110));
-        headerPanel.setPreferredSize(new Dimension(900, 60));
+        // Header — painted hotel-at-night skyline strip instead of a flat color bar
+        HotelBackgroundPanel headerPanel = new HotelBackgroundPanel();
+        headerPanel.setPreferredSize(new Dimension(900, 70));
         frame.getContentPane().add(headerPanel, BorderLayout.NORTH);
         headerPanel.setLayout(new BorderLayout(0, 0));
 
@@ -35,7 +34,7 @@ public class DashboardFrame extends JFrame {
         headerPanel.add(lblHotel, BorderLayout.WEST);
 
         JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        infoPanel.setBackground(new Color(39, 0, 110));
+        infoPanel.setOpaque(false);
         JLabel lblAdmin = new JLabel("Logged in as: " + LoginFrame.currentUserName + "  ");
         lblAdmin.setFont(new Font("SansSerif", Font.PLAIN, 13));
         lblAdmin.setForeground(Color.WHITE);
@@ -43,7 +42,7 @@ public class DashboardFrame extends JFrame {
         headerPanel.add(infoPanel, BorderLayout.CENTER);
 
         JPanel btnPanel = new JPanel();
-        btnPanel.setBackground(new Color(39, 0, 110));
+        btnPanel.setOpaque(false);
         headerPanel.add(btnPanel, BorderLayout.EAST);
 
         JButton btnSettings = new JButton("Settings");
@@ -136,6 +135,9 @@ public class DashboardFrame extends JFrame {
                         ps.setString(2, keys.get(i));
                         ps.executeUpdate();
                     }
+                    AuditLogger.log("Admin", LoginFrame.currentUserName, "Settings Update",
+                        "Updated " + keys.size() + " system setting(s)");
+
                     JOptionPane.showMessageDialog(dialog, "Settings saved!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     dialog.dispose();
                 } catch (SQLException ex) {

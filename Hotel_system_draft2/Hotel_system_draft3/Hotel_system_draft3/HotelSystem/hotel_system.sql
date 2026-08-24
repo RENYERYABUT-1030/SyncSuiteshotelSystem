@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 16, 2026 at 07:13 PM
+-- Generation Time: Aug 24, 2026 at 03:46 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -67,13 +67,6 @@ CREATE TABLE `archived_bookings` (
   `archived_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `archived_bookings`
---
-
-INSERT INTO `archived_bookings` (`archive_id`, `original_booking_id`, `customer_id`, `room_id`, `check_in_date`, `check_out_date`, `total_amount`, `payment_method`, `status`, `adults`, `seniors`, `kids`, `senior_discount`, `extra_guest_charge`, `reschedule_charge`, `archived_by`, `archive_reason`, `archived_at`) VALUES
-(1, 41, 30, 22, '2026-05-18', '2026-05-23', 32000.00, 'Cash', 'Cancelled', 2, 0, 0, 0.00, 0.00, 0.00, 'admin', 'secret', '2026-06-16 16:02:23');
-
 -- --------------------------------------------------------
 
 --
@@ -92,6 +85,16 @@ CREATE TABLE `audit_log` (
   `ip_address` varchar(45) DEFAULT NULL,
   `action_timestamp` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `audit_log`
+--
+
+INSERT INTO `audit_log` (`audit_id`, `user_type`, `user_id`, `action`, `table_affected`, `record_id`, `old_values`, `new_values`, `ip_address`, `action_timestamp`) VALUES
+(1, 'admin', 1, 'LOGIN', NULL, NULL, NULL, NULL, '192.168.1.127', '2026-08-19 07:32:19'),
+(2, 'admin', 1, 'LOGOUT', NULL, NULL, NULL, NULL, '192.168.1.127', '2026-08-19 07:32:47'),
+(3, 'admin', 1, 'LOGIN', NULL, NULL, NULL, NULL, '192.168.1.127', '2026-08-19 07:50:18'),
+(4, 'admin', 1, 'LOGOUT', NULL, NULL, NULL, NULL, '192.168.1.127', '2026-08-19 07:50:23');
 
 -- --------------------------------------------------------
 
@@ -122,11 +125,10 @@ CREATE TABLE `bookings` (
 --
 
 INSERT INTO `bookings` (`booking_id`, `customer_id`, `room_id`, `check_in_date`, `check_out_date`, `total_amount`, `reschedule_charge`, `payment_method`, `status`, `adults`, `seniors`, `kids`, `senior_discount`, `extra_guest_charge`, `created_at`) VALUES
-(39, 28, 9, '2026-05-18', '2026-05-19', 3920.00, 0.00, 'Cash', 'Checked Out', 2, 1, 0, 700.00, 0.00, '2026-05-18 01:59:22'),
-(40, 29, 17, '2026-05-18', '2026-05-21', 26400.00, 0.00, 'Cash', 'Checked Out', 4, 0, 0, 0.00, 0.00, '2026-05-18 02:00:17'),
-(42, 31, 2, '2026-05-18', '2026-05-21', 7200.00, 0.00, 'GCash/QR Scan', 'Reserved', 2, 0, 0, 0.00, 0.00, '2026-05-18 02:04:45'),
-(43, 32, 1, '2026-06-17', '2026-06-20', 12420.00, 0.00, 'Cash', 'Checked In', 3, 2, 1, 1080.00, 6000.00, '2026-06-16 16:01:40'),
-(44, 28, 22, '2026-06-17', '2026-06-21', 27733.33, 0.00, 'Cash', 'Checked In', 1, 2, 2, 4266.67, 0.00, '2026-06-16 16:39:34');
+(48, 36, 9, '2026-06-17', '2026-06-18', 3033.33, 0.00, 'Cash', 'Checked Out', 1, 2, 0, 466.67, 0.00, '2026-06-17 13:09:23'),
+(49, 37, 1, '2026-06-17', '2026-06-18', 3466.67, 0.00, 'Cash', 'Reserved', 1, 2, 2, 533.33, 1500.00, '2026-06-17 13:24:02'),
+(50, 38, 2, '2026-06-17', '2026-06-18', 2500.00, 0.00, 'Cash', 'Checked Out', 1, 0, 0, 0.00, 0.00, '2026-06-17 13:35:01'),
+(51, 28, 3, '2026-06-17', '2026-06-19', 5000.00, 0.00, 'Cash', 'Checked Out', 1, 0, 0, 0.00, 0.00, '2026-06-17 15:09:57');
 
 -- --------------------------------------------------------
 
@@ -149,11 +151,18 @@ CREATE TABLE `customers` (
 --
 
 INSERT INTO `customers` (`customer_id`, `first_name`, `last_name`, `phone_number`, `email`, `total_visits`, `created_at`) VALUES
-(28, 'SEAN', 'UTRERA', '09811741631', 'seantur@gmail.com', 2, '2026-05-18 01:59:22'),
+(28, 'SEAN', 'UTRERA', '09811741631', 'seantur@gmail.com', 3, '2026-05-18 01:59:22'),
 (29, 'DWIGTH', 'RAMOS', '09223344556', 'dwigrmos@gmail.com', 1, '2026-05-18 02:00:17'),
-(30, 'ARJAY', 'ESPIJON', '09876765366', 'arj@gmail.com', 0, '2026-05-18 02:02:14'),
+(30, 'ARJAY', 'ESPIJON', '09876765366', 'arj@gmail.com', 1, '2026-05-18 02:02:14'),
 (31, 'BOGARD', 'SENTENO', '09827366646', 'bograd@gmail.com', 0, '2026-05-18 02:04:45'),
-(32, 'HIRO', 'ZENN', '09811741641', 'hirozen@gmail.com', 1, '2026-06-17 00:01:40');
+(32, 'HIRO', 'ZENN', '09811741641', 'hirozen@gmail.com', 1, '2026-06-17 00:01:40'),
+(33, 'ADRIAN', 'BAGUHIN', '09811741641', 'yabutrenyer30@gmail.com', 1, '2026-06-17 01:39:04'),
+(34, 'RYZNE', 'YABTU', '09811741641', 'yrenyer45@gmail. com', 0, '2026-06-17 03:37:47'),
+(35, 'RENDEL', 'CEDENO', '09811741641', 'nocumrendel@gmail.com', 1, '2026-06-17 20:54:29'),
+(36, 'RENDEL', 'CEDENO', '09676767676', 'nocumrendel@gmail.com', 1, '2026-06-17 21:09:23'),
+(37, 'RENYER', 'YABUT', '09811741641', 'yrenyer45@gmail.com', 1, '2026-06-17 21:24:02'),
+(38, 'RENYER', 'YABUT', '09811741641', 'yabutrenyer30@gmail.com', 1, '2026-06-17 21:33:49'),
+(39, 'RYZEN', 'TUBAY', '09811741641', 'yabutrenyer30@gmail.com', 0, '2026-08-24 21:21:10');
 
 -- --------------------------------------------------------
 
@@ -179,16 +188,11 @@ CREATE TABLE `notification_log` (
 --
 
 INSERT INTO `notification_log` (`log_id`, `booking_id`, `customer_id`, `notification_type`, `recipient`, `subject`, `content`, `status`, `error_message`, `sent_at`) VALUES
-(1, 43, NULL, 'SMS', '09811741641', 'Receipt RCP-1781625907428', 'Sync Suites Hotel\nReceipt: RCP-1781625907428\nCustomer: HIRO ZENN\nAmount: ₱12,420.00\nThank you for your stay!', 'Sent', NULL, '2026-06-16 16:07:14'),
-(2, 43, NULL, 'SMS', '09811741641', 'Receipt RCP-1781625907428', 'Sync Suites Hotel\nReceipt: RCP-1781625907428\nCustomer: HIRO ZENN\nAmount: ₱12,420.00\nThank you for your stay!', 'Sent', NULL, '2026-06-16 16:07:25'),
-(3, 44, NULL, 'SMS', '09811741641', 'Receipt RCP-1781628068475', 'Sync Suites Hotel\nReceipt: RCP-1781628068475\nCustomer: SEAN UTRERA\nAmount: ₱27,733.33\nThank you for your stay!', 'Sent', NULL, '2026-06-16 16:41:25'),
-(4, 44, NULL, 'SMS', '09811741641', 'Receipt RCP-1781628068475', 'Sync Suites Hotel\nReceipt: RCP-1781628068475\nCustomer: SEAN UTRERA\nAmount: ₱27,733.33\nThank you for your stay!', 'Sent', NULL, '2026-06-16 16:41:46'),
-(5, 44, NULL, 'SMS', '09811741641', 'Receipt RCP-1781628068475', 'Sync Suites Hotel\nReceipt: RCP-1781628068475\nCustomer: SEAN UTRERA\nAmount: ₱27,733.33\nThank you for your stay!', 'Sent', NULL, '2026-06-16 16:41:55'),
-(6, 44, NULL, 'SMS', '09811741641', 'Receipt RCP-1781628068475', 'Sync Suites Hotel\nReceipt: RCP-1781628068475\nCustomer: SEAN UTRERA\nAmount: ₱27,733.33\nThank you for your stay!', 'Sent', NULL, '2026-06-16 16:42:10'),
-(7, 44, NULL, 'SMS', '09811741641', 'Receipt RCP-1781628068475', 'Sync Suites Hotel\nReceipt: RCP-1781628068475\nCustomer: SEAN UTRERA\nAmount: ₱27,733.33\nThank you for your stay!', 'Sent', NULL, '2026-06-16 16:47:17'),
-(8, 44, NULL, 'SMS', '09811741641', 'Receipt RCP-1781629555497', 'Sync Suites Hotel\nReceipt: RCP-1781629555497\nCustomer: SEAN UTRERA\nAmount: ₱27,733.33\nThank you for your stay!', 'Sent', NULL, '2026-06-16 17:06:38'),
-(9, 44, NULL, 'SMS', '09811741641', 'Receipt RCP-1781629555497', 'Sync Suites Hotel\nReceipt: RCP-1781629555497\nCustomer: SEAN UTRERA\nAmount: ₱27,733.33\nThank you for your stay!', 'Sent', NULL, '2026-06-16 17:06:47'),
-(10, 44, NULL, 'SMS', '09811741641', 'Receipt RCP-1781629555497', 'Sync Suites Hotel\nReceipt: RCP-1781629555497\nCustomer: SEAN UTRERA\nAmount: ₱27,733.33\nThank you for your stay!', 'Sent', NULL, '2026-06-16 17:06:54');
+(37, 48, NULL, 'Email', 'fromytlang@gmail.com', 'Receipt RCP-1781701851924', 'Thank you for choosing Sync Suites Hotel! Your receipt is attached.', 'Sent', NULL, '2026-06-17 13:11:52'),
+(38, 50, NULL, 'SMS', '09811741641', 'Receipt RCP-1781703515222', 'Sync Suites Hotel\nReceipt: RCP-1781703515222\nCustomer: RENYER YABUT\nAmount: ₱2,500.00\nThank you for your stay!', 'Sent', NULL, '2026-06-17 13:40:20'),
+(39, 50, NULL, 'Email', 'fromytlang@gmail.com', 'Receipt RCP-1781703515222', 'Thank you for choosing Sync Suites Hotel! Your receipt is attached.', 'Sent', NULL, '2026-06-17 13:40:42'),
+(40, 51, NULL, 'Email', 'sutrera.7543@umak.edu.ph', 'Receipt RCP-1781709014132', 'Thank you for choosing Sync Suites Hotel! Your receipt is attached.', 'Sent', NULL, '2026-06-17 15:10:50'),
+(41, 49, NULL, 'Email', 'daniel12utrera@gmail.com', 'Receipt RCP-1781712180627', 'Thank you for choosing Sync Suites Hotel! Your receipt is attached.', 'Sent', NULL, '2026-08-12 14:11:48');
 
 -- --------------------------------------------------------
 
@@ -214,10 +218,9 @@ CREATE TABLE `payment_transactions` (
 --
 
 INSERT INTO `payment_transactions` (`transaction_id`, `booking_id`, `customer_id`, `amount`, `payment_method`, `qr_reference`, `qr_image_data`, `transaction_status`, `paid_at`, `created_at`) VALUES
-(1, 43, 32, 12420.00, 'QR PH', 'QRPH-1781626002812-43', NULL, 'Pending', NULL, '2026-06-16 16:06:42'),
-(2, 44, 28, 27733.33, 'QR PH', 'QRPH-1781628034445-44', NULL, 'Pending', NULL, '2026-06-16 16:40:34'),
-(3, 44, 28, 27733.33, 'QR PH', 'QRPH-1781628107700-44', NULL, 'Pending', NULL, '2026-06-16 16:41:47'),
-(4, 44, 28, 27733.33, 'QR PH', 'QRPH-1781629603830-44', NULL, 'Pending', NULL, '2026-06-16 17:06:43');
+(12, 50, 38, 2500.00, 'QR PH', 'QRPH-1781703586934-50', NULL, 'Pending', NULL, '2026-06-17 13:39:46'),
+(13, 50, 38, 2500.00, 'QR PH', 'QRPH-1781703591740-50', NULL, 'Pending', NULL, '2026-06-17 13:39:51'),
+(14, 49, 37, 3466.67, 'QR PH', 'QRPH-1786543961744-49', NULL, 'Pending', NULL, '2026-08-12 14:12:41');
 
 -- --------------------------------------------------------
 
@@ -245,13 +248,22 @@ CREATE TABLE `receipts` (
 --
 
 INSERT INTO `receipts` (`receipt_id`, `booking_id`, `customer_id`, `receipt_number`, `receipt_data`, `total_amount`, `printed_by`, `printed_at`, `emailed_to`, `emailed_at`, `sms_sent_to`, `sms_sent_at`) VALUES
-(1, 42, 31, 'RCP-1781625756784', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781625756784\nDate: 2026-06-17 00:02:36\nBooking ID: 42\n\n----------------------------------------\nCUSTOMER INFORMATION\n----------------------------------------\nName:    BOGARD SENTENO\nPhone:   09827366646\nEmail:   bograd@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        102 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-05-18\nCheck-Out:   2026-05-21\nStatus:      Reserved\nPayment:     GCash/QR Scan\n\n----------------------------------------\nGUEST BREAKDOWN\n----------------------------------------\nAdults:      2\nSeniors/PWD: 0 (20% discount applied)\nKids:        0 (Free)\n\n----------------------------------------\nCHARGES\n----------------------------------------\nBase Amount:              ₱  7,200.00\n----------------------------------------\nTOTAL AMOUNT:             ₱  7,200.00\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nFor inquiries: info@syncsuites.com\nPhone: +63 912 345 6789\n\nTHIS IS AN OFFICIAL RECEIPT\nKeep this for your records.\n', 7200.00, 'admin', '2026-06-16 16:02:36', NULL, NULL, NULL, NULL),
-(2, 43, 32, 'RCP-1781625907428', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781625907428\nDate: 2026-06-17 00:05:07\nBooking ID: 43\n\n----------------------------------------\nCUSTOMER\n----------------------------------------\nName:    HIRO ZENN\nPhone:   09811741641\nEmail:   hirozen@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        101 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-20\nStatus:      Reserved\nPayment:     Cash\n\n----------------------------------------\nGUESTS\n----------------------------------------\nAdults:      3\nSeniors/PWD: 2\nKids:        1\n\n----------------------------------------\nCHARGES\n----------------------------------------\nExtra Guest:              ₱  6,000.00\nSenior Discount:          -₱ 1,080.00\n----------------------------------------\nTOTAL:                    ₱ 12,420.00\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nTHIS IS AN OFFICIAL RECEIPT\n', 12420.00, 'admin', '2026-06-16 16:05:11', NULL, NULL, '09811741641', '2026-06-16 16:07:25'),
-(3, 39, 28, 'RCP-1781628048981', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781628048981\nDate: 2026-06-17 00:40:48\nBooking ID: 39\n\n----------------------------------------\nCUSTOMER INFORMATION\n----------------------------------------\nName:    SEAN UTRERA\nPhone:   09811741631\nEmail:   seantur@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        201 (Junior Suite)\nRate/Day:    ₱3,500.00\nCheck-In:    2026-05-18\nCheck-Out:   2026-05-19\nStatus:      Checked Out\nPayment:     Cash\n\n----------------------------------------\nGUEST BREAKDOWN\n----------------------------------------\nAdults:      2\nSeniors/PWD: 1 (20% discount applied)\nKids:        0 (Free)\n\n----------------------------------------\nCHARGES\n----------------------------------------\nBase Amount:              ₱  4,620.00\nSenior/PWD Discount:      -₱   700.00\n----------------------------------------\nTOTAL AMOUNT:             ₱  3,920.00\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nFor inquiries: info@syncsuites.com\nPhone: +63 912 345 6789\n\nTHIS IS AN OFFICIAL RECEIPT\nKeep this for your records.\n', 3920.00, 'admin', '2026-06-16 16:40:48', NULL, NULL, NULL, NULL),
-(4, 44, 28, 'RCP-1781628068475', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781628068475\nDate: 2026-06-17 00:41:08\nBooking ID: 44\n\n----------------------------------------\nCUSTOMER\n----------------------------------------\nName:    SEAN UTRERA\nPhone:   09811741631\nEmail:   seantur@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        401 (Presidential Suite)\nRate/Day:    ₱8,000.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-21\nStatus:      Checked In\nPayment:     Cash\n\n----------------------------------------\nGUESTS\n----------------------------------------\nAdults:      1\nSeniors/PWD: 2\nKids:        2\n\n----------------------------------------\nCHARGES\n----------------------------------------\nSenior Discount:          -₱ 4,266.67\n----------------------------------------\nTOTAL:                    ₱ 27,733.33\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nTHIS IS AN OFFICIAL RECEIPT\n', 27733.33, 'admin', '2026-06-16 16:41:10', NULL, NULL, '09811741641', '2026-06-16 16:47:17'),
-(5, 44, 28, 'RCP-1781629548353', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781629548353\nDate: 2026-06-17 01:05:48\nBooking ID: 44\n\n----------------------------------------\nCUSTOMER INFORMATION\n----------------------------------------\nName:    SEAN UTRERA\nPhone:   09811741631\nEmail:   seantur@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        401 (Presidential Suite)\nRate/Day:    ₱8,000.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-21\nStatus:      Checked In\nPayment:     Cash\n\n----------------------------------------\nGUEST BREAKDOWN\n----------------------------------------\nAdults:      1\nSeniors/PWD: 2 (20% discount applied)\nKids:        2 (Free)\n\n----------------------------------------\nCHARGES\n----------------------------------------\nBase Amount:              ₱ 32,000.00\nSenior/PWD Discount:      -₱ 4,266.67\n----------------------------------------\nTOTAL AMOUNT:             ₱ 27,733.33\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nFor inquiries: info@syncsuites.com\nPhone: +63 912 345 6789\n\nTHIS IS AN OFFICIAL RECEIPT\nKeep this for your records.\n', 27733.33, 'admin', '2026-06-16 17:05:48', NULL, NULL, NULL, NULL),
-(6, 43, 32, 'RCP-1781629551410', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781629551410\nDate: 2026-06-17 01:05:51\nBooking ID: 43\n\n----------------------------------------\nCUSTOMER INFORMATION\n----------------------------------------\nName:    HIRO ZENN\nPhone:   09811741641\nEmail:   hirozen@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        101 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-20\nStatus:      Checked In\nPayment:     Cash\n\n----------------------------------------\nGUEST BREAKDOWN\n----------------------------------------\nAdults:      3\nSeniors/PWD: 2 (20% discount applied)\nKids:        1 (Free)\n\n----------------------------------------\nCHARGES\n----------------------------------------\nBase Amount:              ₱  7,500.00\nExtra Guest Charge:       ₱  6,000.00\nSenior/PWD Discount:      -₱ 1,080.00\n----------------------------------------\nTOTAL AMOUNT:             ₱ 12,420.00\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nFor inquiries: info@syncsuites.com\nPhone: +63 912 345 6789\n\nTHIS IS AN OFFICIAL RECEIPT\nKeep this for your records.\n', 12420.00, 'admin', '2026-06-16 17:05:51', NULL, NULL, NULL, NULL),
-(7, 44, 28, 'RCP-1781629555497', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781629555497\nDate: 2026-06-17 01:05:55\nBooking ID: 44\n\n----------------------------------------\nCUSTOMER INFORMATION\n----------------------------------------\nName:    SEAN UTRERA\nPhone:   09811741631\nEmail:   seantur@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        401 (Presidential Suite)\nRate/Day:    ₱8,000.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-21\nStatus:      Checked In\nPayment:     Cash\n\n----------------------------------------\nGUEST BREAKDOWN\n----------------------------------------\nAdults:      1\nSeniors/PWD: 2 (20% discount applied)\nKids:        2 (Free)\n\n----------------------------------------\nCHARGES\n----------------------------------------\nBase Amount:              ₱ 32,000.00\nSenior/PWD Discount:      -₱ 4,266.67\n----------------------------------------\nTOTAL AMOUNT:             ₱ 27,733.33\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nFor inquiries: info@syncsuites.com\nPhone: +63 912 345 6789\n\nTHIS IS AN OFFICIAL RECEIPT\nKeep this for your records.\n', 27733.33, 'admin', '2026-06-16 17:05:55', NULL, NULL, '09811741641', '2026-06-16 17:06:54');
+(26, 48, 36, 'RCP-1781701800490', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781701800490\nDate: 2026-06-17 21:10:00\nBooking ID: 48\n\n----------------------------------------\nCUSTOMER\n----------------------------------------\nName:    RENDEL CEDENO\nPhone:   09676767676\nEmail:   nocumrendel@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        201 (Junior Suite)\nRate/Day:    ₱3,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-18\nStatus:      Reserved\nPayment:     Cash\n\n----------------------------------------\nGUESTS\n----------------------------------------\nAdults:      1\nSeniors/PWD: 2\nKids:        0\n\n----------------------------------------\nCHARGES\n----------------------------------------\nSenior Discount:          -₱   466.67\n----------------------------------------\nTOTAL:                    ₱  3,033.33\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nTHIS IS AN OFFICIAL RECEIPT\n', 3033.33, 'admin', '2026-06-17 13:10:01', NULL, NULL, NULL, NULL),
+(27, 48, 36, 'RCP-1781701828401', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781701828401\nDate: 2026-06-17 21:10:28\nBooking ID: 48\n\n----------------------------------------\nCUSTOMER\n----------------------------------------\nName:    RENDEL CEDENO\nPhone:   09676767676\nEmail:   nocumrendel@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        201 (Junior Suite)\nRate/Day:    ₱3,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-18\nStatus:      Reserved\nPayment:     Cash\n\n----------------------------------------\nGUESTS\n----------------------------------------\nAdults:      1\nSeniors/PWD: 2\nKids:        0\n\n----------------------------------------\nCHARGES\n----------------------------------------\nSenior Discount:          -₱   466.67\n----------------------------------------\nTOTAL:                    ₱  3,033.33\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nTHIS IS AN OFFICIAL RECEIPT\n', 3033.33, 'admin', '2026-06-17 13:10:29', NULL, NULL, NULL, NULL),
+(28, 48, 36, 'RCP-1781701851924', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781701851924\nDate: 2026-06-17 21:10:51\nBooking ID: 48\n\n----------------------------------------\nCUSTOMER\n----------------------------------------\nName:    RENDEL CEDENO\nPhone:   09676767676\nEmail:   nocumrendel@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        201 (Junior Suite)\nRate/Day:    ₱3,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-18\nStatus:      Reserved\nPayment:     Cash\n\n----------------------------------------\nGUESTS\n----------------------------------------\nAdults:      1\nSeniors/PWD: 2\nKids:        0\n\n----------------------------------------\nCHARGES\n----------------------------------------\nSenior Discount:          -₱   466.67\n----------------------------------------\nTOTAL:                    ₱  3,033.33\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nTHIS IS AN OFFICIAL RECEIPT\n', 3033.33, 'admin', '2026-06-17 13:10:54', 'fromytlang@gmail.com', '2026-06-17 13:11:52', NULL, NULL),
+(29, 49, 37, 'RCP-1781702665656', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781702665656\nDate: 2026-06-17 21:24:25\nBooking ID: 49\n\n----------------------------------------\nCUSTOMER\n----------------------------------------\nName:    RENYER YABUT\nPhone:   09811741641\nEmail:   yrenyer45@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        101 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-18\nStatus:      Reserved\nPayment:     Cash\n\n----------------------------------------\nGUESTS\n----------------------------------------\nAdults:      1\nSeniors/PWD: 2\nKids:        2\n\n----------------------------------------\nCHARGES\n----------------------------------------\nExtra Guest:              ₱  1,500.00\nSenior Discount:          -₱   533.33\n----------------------------------------\nTOTAL:                    ₱  3,466.67\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nTHIS IS AN OFFICIAL RECEIPT\n', 3466.67, 'admin', '2026-06-17 13:24:27', NULL, NULL, NULL, NULL),
+(30, 48, 36, 'RCP-1781702685833', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781702685833\nDate: 2026-06-17 21:24:45\nBooking ID: 48\n\n----------------------------------------\nCUSTOMER INFORMATION\n----------------------------------------\nName:    RENDEL CEDENO\nPhone:   09676767676\nEmail:   nocumrendel@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        201 (Junior Suite)\nRate/Day:    ₱3,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-18\nStatus:      Checked In\nPayment:     Cash\n\n----------------------------------------\nGUEST BREAKDOWN\n----------------------------------------\nAdults:      1\nSeniors/PWD: 2 (20% discount applied)\nKids:        0 (Free)\n\n----------------------------------------\nCHARGES\n----------------------------------------\nBase Amount:              ₱  3,500.00\nSenior/PWD Discount:      -₱   466.67\n----------------------------------------\nTOTAL AMOUNT:             ₱  3,033.33\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nFor inquiries: info@syncsuites.com\nPhone: +63 912 345 6789\n\nTHIS IS AN OFFICIAL RECEIPT\nKeep this for your records.\n', 3033.33, 'admin', '2026-06-17 13:24:45', NULL, NULL, NULL, NULL),
+(31, 50, 38, 'RCP-1781703340344', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781703340344\nDate: 2026-06-17 21:35:40\nBooking ID: 50\n\n----------------------------------------\nCUSTOMER\n----------------------------------------\nName:    RENYER YABUT\nPhone:   09811741641\nEmail:   yabutrenyer30@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        102 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-18\nStatus:      Reserved\nPayment:     Cash\n\n----------------------------------------\nGUESTS\n----------------------------------------\nAdults:      1\nSeniors/PWD: 0\nKids:        0\n\n----------------------------------------\nCHARGES\n----------------------------------------\n----------------------------------------\nTOTAL:                    ₱  2,500.00\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nTHIS IS AN OFFICIAL RECEIPT\n', 2500.00, 'admin', '2026-06-17 13:35:41', NULL, NULL, NULL, NULL),
+(32, 50, 38, 'RCP-1781703379162', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781703379162\nDate: 2026-06-17 21:36:19\nBooking ID: 50\n\n----------------------------------------\nCUSTOMER\n----------------------------------------\nName:    RENYER YABUT\nPhone:   09811741641\nEmail:   yabutrenyer30@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        102 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-18\nStatus:      Reserved\nPayment:     Cash\n\n----------------------------------------\nGUESTS\n----------------------------------------\nAdults:      1\nSeniors/PWD: 0\nKids:        0\n\n----------------------------------------\nCHARGES\n----------------------------------------\n----------------------------------------\nTOTAL:                    ₱  2,500.00\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nTHIS IS AN OFFICIAL RECEIPT\n', 2500.00, 'admin', '2026-06-17 13:36:20', NULL, NULL, NULL, NULL),
+(33, 50, 38, 'RCP-1781703515222', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781703515222\nDate: 2026-06-17 21:38:35\nBooking ID: 50\n\n----------------------------------------\nCUSTOMER\n----------------------------------------\nName:    RENYER YABUT\nPhone:   09811741641\nEmail:   yabutrenyer30@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        102 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-18\nStatus:      Checked In\nPayment:     Cash\n\n----------------------------------------\nGUESTS\n----------------------------------------\nAdults:      1\nSeniors/PWD: 0\nKids:        0\n\n----------------------------------------\nCHARGES\n----------------------------------------\n----------------------------------------\nTOTAL:                    ₱  2,500.00\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nTHIS IS AN OFFICIAL RECEIPT\n', 2500.00, 'admin', '2026-06-17 13:38:36', 'fromytlang@gmail.com', '2026-06-17 13:40:42', '09811741641', '2026-06-17 13:40:20'),
+(34, 49, 37, 'RCP-1781703566153', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781703566153\nDate: 2026-06-17 21:39:26\nBooking ID: 49\n\n----------------------------------------\nCUSTOMER INFORMATION\n----------------------------------------\nName:    RENYER YABUT\nPhone:   09811741641\nEmail:   yrenyer45@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        101 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-18\nStatus:      Reserved\nPayment:     Cash\n\n----------------------------------------\nGUEST BREAKDOWN\n----------------------------------------\nAdults:      1\nSeniors/PWD: 2 (20% discount applied)\nKids:        2 (Free)\n\n----------------------------------------\nCHARGES\n----------------------------------------\nBase Amount:              ₱  2,500.00\nExtra Guest Charge:       ₱  1,500.00\nSenior/PWD Discount:      -₱   533.33\n----------------------------------------\nTOTAL AMOUNT:             ₱  3,466.67\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nFor inquiries: info@syncsuites.com\nPhone: +63 912 345 6789\n\nTHIS IS AN OFFICIAL RECEIPT\nKeep this for your records.\n', 3466.67, 'admin', '2026-06-17 13:39:26', NULL, NULL, NULL, NULL),
+(35, 51, 28, 'RCP-1781709014132', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781709014132\nDate: 2026-06-17 23:10:14\nBooking ID: 51\n\n----------------------------------------\nCUSTOMER\n----------------------------------------\nName:    SEAN UTRERA\nPhone:   09811741631\nEmail:   seantur@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        103 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-19\nStatus:      Checked In\nPayment:     Cash\n\n----------------------------------------\nGUESTS\n----------------------------------------\nAdults:      1\nSeniors/PWD: 0\nKids:        0\n\n----------------------------------------\nCHARGES\n----------------------------------------\n----------------------------------------\nTOTAL:                    ₱  5,000.00\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nTHIS IS AN OFFICIAL RECEIPT\n', 5000.00, 'admin', '2026-06-17 15:10:15', 'sutrera.7543@umak.edu.ph', '2026-06-17 15:10:50', NULL, NULL),
+(36, 50, 38, 'RCP-1781709332850', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781709332850\nDate: 2026-06-17 23:15:32\nBooking ID: 50\n\n----------------------------------------\nCUSTOMER INFORMATION\n----------------------------------------\nName:    RENYER YABUT\nPhone:   09811741641\nEmail:   yabutrenyer30@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        102 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-18\nStatus:      Checked In\nPayment:     Cash\n\n----------------------------------------\nGUEST BREAKDOWN\n----------------------------------------\nAdults:      1\nSeniors/PWD: 0 (20% discount applied)\nKids:        0 (Free)\n\n----------------------------------------\nCHARGES\n----------------------------------------\nBase Amount:              ₱  2,500.00\n----------------------------------------\nTOTAL AMOUNT:             ₱  2,500.00\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nFor inquiries: info@syncsuites.com\nPhone: +63 912 345 6789\n\nTHIS IS AN OFFICIAL RECEIPT\nKeep this for your records.\n', 2500.00, 'admin', '2026-06-17 15:15:32', NULL, NULL, NULL, NULL),
+(37, 51, 28, 'RCP-1781712173210', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781712173210\nDate: 2026-06-18 00:02:53\nBooking ID: 51\n\n----------------------------------------\nCUSTOMER INFORMATION\n----------------------------------------\nName:    SEAN UTRERA\nPhone:   09811741631\nEmail:   seantur@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        103 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-19\nStatus:      Checked In\nPayment:     Cash\n\n----------------------------------------\nGUEST BREAKDOWN\n----------------------------------------\nAdults:      1\nSeniors/PWD: 0 (20% discount applied)\nKids:        0 (Free)\n\n----------------------------------------\nCHARGES\n----------------------------------------\nBase Amount:              ₱  5,000.00\n----------------------------------------\nTOTAL AMOUNT:             ₱  5,000.00\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nFor inquiries: info@syncsuites.com\nPhone: +63 912 345 6789\n\nTHIS IS AN OFFICIAL RECEIPT\nKeep this for your records.\n', 5000.00, 'admin', '2026-06-17 16:02:53', NULL, NULL, NULL, NULL),
+(38, 50, 38, 'RCP-1781712176597', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781712176597\nDate: 2026-06-18 00:02:56\nBooking ID: 50\n\n----------------------------------------\nCUSTOMER INFORMATION\n----------------------------------------\nName:    RENYER YABUT\nPhone:   09811741641\nEmail:   yabutrenyer30@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        102 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-18\nStatus:      Checked In\nPayment:     Cash\n\n----------------------------------------\nGUEST BREAKDOWN\n----------------------------------------\nAdults:      1\nSeniors/PWD: 0 (20% discount applied)\nKids:        0 (Free)\n\n----------------------------------------\nCHARGES\n----------------------------------------\nBase Amount:              ₱  2,500.00\n----------------------------------------\nTOTAL AMOUNT:             ₱  2,500.00\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nFor inquiries: info@syncsuites.com\nPhone: +63 912 345 6789\n\nTHIS IS AN OFFICIAL RECEIPT\nKeep this for your records.\n', 2500.00, 'admin', '2026-06-17 16:02:56', NULL, NULL, NULL, NULL),
+(39, 49, 37, 'RCP-1781712180627', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781712180627\nDate: 2026-06-18 00:03:00\nBooking ID: 49\n\n----------------------------------------\nCUSTOMER INFORMATION\n----------------------------------------\nName:    RENYER YABUT\nPhone:   09811741641\nEmail:   yrenyer45@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        101 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-18\nStatus:      Reserved\nPayment:     Cash\n\n----------------------------------------\nGUEST BREAKDOWN\n----------------------------------------\nAdults:      1\nSeniors/PWD: 2 (20% discount applied)\nKids:        2 (Free)\n\n----------------------------------------\nCHARGES\n----------------------------------------\nBase Amount:              ₱  2,500.00\nExtra Guest Charge:       ₱  1,500.00\nSenior/PWD Discount:      -₱   533.33\n----------------------------------------\nTOTAL AMOUNT:             ₱  3,466.67\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nFor inquiries: info@syncsuites.com\nPhone: +63 912 345 6789\n\nTHIS IS AN OFFICIAL RECEIPT\nKeep this for your records.\n', 3466.67, 'admin', '2026-06-17 16:03:00', 'daniel12utrera@gmail.com', '2026-08-12 14:11:48', NULL, NULL),
+(40, 48, 36, 'RCP-1781712184644', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1781712184644\nDate: 2026-06-18 00:03:04\nBooking ID: 48\n\n----------------------------------------\nCUSTOMER INFORMATION\n----------------------------------------\nName:    RENDEL CEDENO\nPhone:   09676767676\nEmail:   nocumrendel@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        201 (Junior Suite)\nRate/Day:    ₱3,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-18\nStatus:      Checked In\nPayment:     Cash\n\n----------------------------------------\nGUEST BREAKDOWN\n----------------------------------------\nAdults:      1\nSeniors/PWD: 2 (20% discount applied)\nKids:        0 (Free)\n\n----------------------------------------\nCHARGES\n----------------------------------------\nBase Amount:              ₱  3,500.00\nSenior/PWD Discount:      -₱   466.67\n----------------------------------------\nTOTAL AMOUNT:             ₱  3,033.33\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nFor inquiries: info@syncsuites.com\nPhone: +63 912 345 6789\n\nTHIS IS AN OFFICIAL RECEIPT\nKeep this for your records.\n', 3033.33, 'admin', '2026-06-17 16:03:04', NULL, NULL, NULL, NULL),
+(41, 51, 28, 'RCP-1786543816092', '╔══════════════════════════════════════════╗\n║         SYNC SUITES HOTEL                ║\n║      Official Payment Receipt            ║\n╚══════════════════════════════════════════╝\n\nReceipt No: RCP-1786543816092\nDate: 2026-08-12 22:10:16\nBooking ID: 51\n\n----------------------------------------\nCUSTOMER INFORMATION\n----------------------------------------\nName:    SEAN UTRERA\nPhone:   09811741631\nEmail:   seantur@gmail.com\n\n----------------------------------------\nBOOKING DETAILS\n----------------------------------------\nRoom:        103 (Standard Room)\nRate/Day:    ₱2,500.00\nCheck-In:    2026-06-17\nCheck-Out:   2026-06-19\nStatus:      Checked Out\nPayment:     Cash\n\n----------------------------------------\nGUEST BREAKDOWN\n----------------------------------------\nAdults:      1\nSeniors/PWD: 0 (20% discount applied)\nKids:        0 (Free)\n\n----------------------------------------\nCHARGES\n----------------------------------------\nBase Amount:              ₱  5,000.00\n----------------------------------------\nTOTAL AMOUNT:             ₱  5,000.00\n----------------------------------------\n\nThank you for choosing Sync Suites Hotel!\nFor inquiries: info@syncsuites.com\nPhone: +63 912 345 6789\n\nTHIS IS AN OFFICIAL RECEIPT\nKeep this for your records.\n', 5000.00, 'admin', '2026-08-12 14:10:16', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -273,8 +285,8 @@ CREATE TABLE `rooms` (
 --
 
 INSERT INTO `rooms` (`room_id`, `room_number`, `room_type_id`, `floor_number`, `is_available`, `is_maintenance`) VALUES
-(1, '101', 1, 1, 0, 0),
-(2, '102', 1, 1, 0, 0),
+(1, '101', 1, 1, 1, 0),
+(2, '102', 1, 1, 1, 0),
 (3, '103', 1, 1, 1, 0),
 (4, '104', 1, 1, 1, 0),
 (5, '105', 1, 1, 1, 0),
@@ -294,7 +306,7 @@ INSERT INTO `rooms` (`room_id`, `room_number`, `room_type_id`, `floor_number`, `
 (19, '303', 3, 3, 1, 0),
 (20, '304', 3, 3, 1, 0),
 (21, '305', 3, 3, 1, 0),
-(22, '401', 4, 4, 0, 0),
+(22, '401', 4, 4, 1, 0),
 (23, '402', 4, 4, 1, 0),
 (24, '403', 4, 4, 1, 0),
 (25, '404', 4, 4, 1, 0),
@@ -342,17 +354,17 @@ CREATE TABLE `system_settings` (
 
 INSERT INTO `system_settings` (`setting_id`, `setting_key`, `setting_value`, `description`, `updated_at`) VALUES
 (1, 'hotel_name', 'Sync Suites Hotel', 'Hotel display name', '2026-06-16 14:58:50'),
-(2, 'hotel_address', '123 Main Street, City, Philippines', 'Hotel address', '2026-06-16 14:58:50'),
+(2, 'hotel_address', '123 Tomas Morato Ave Quezon CIty Manila Philipines', 'Hotel address', '2026-06-16 19:30:19'),
 (3, 'hotel_phone', '+63 912 345 6789', 'Hotel contact number', '2026-06-16 14:58:50'),
 (4, 'hotel_email', 'info@syncsuites.com', 'Hotel email', '2026-06-16 14:58:50'),
 (5, 'senior_discount_rate', '0.20', 'Senior/PWD discount percentage', '2026-06-16 14:58:50'),
 (6, 'max_advance_booking_days', '90', 'Maximum days allowed for advance booking', '2026-06-16 14:58:50'),
 (7, 'check_in_time', '14:00', 'Standard check-in time', '2026-06-16 14:58:50'),
 (8, 'check_out_time', '12:00', 'Standard check-out time', '2026-06-16 14:58:50'),
-(9, 'smtp_host', 'yrenyer45@gmail.com', 'SMTP server for emails', '2026-06-16 16:44:05'),
-(10, 'smtp_port', '587', 'SMTP port', '2026-06-16 14:58:50'),
-(11, 'smtp_username', '', 'SMTP username', '2026-06-16 14:58:50'),
-(12, 'smtp_password', '', 'SMTP password', '2026-06-16 14:58:50'),
+(9, 'smtp_host', 'smtp.gmail.com', 'SMTP server for emails', '2026-06-16 17:29:41'),
+(10, 'smtp_port', '587', 'SMTP port', '2026-06-16 18:00:43'),
+(11, 'smtp_username', 'syncsuiteshotel@gmail.com', 'SMTP username', '2026-06-17 12:27:41'),
+(12, 'smtp_password', 'fdaynxshphfbretg', 'SMTP password', '2026-06-17 12:27:41'),
 (13, 'twilio_sid', '', 'Twilio Account SID for SMS', '2026-06-16 14:58:50'),
 (14, 'twilio_auth_token', '', 'Twilio Auth Token', '2026-06-16 14:58:50'),
 (15, 'twilio_phone', '', 'Twilio phone number', '2026-06-16 14:58:50');
@@ -374,6 +386,15 @@ CREATE TABLE `users` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `last_login` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`user_id`, `customer_id`, `username`, `password`, `email`, `phone_number`, `is_active`, `created_at`, `last_login`) VALUES
+(1, 34, 'ren123', 'renyer', 'yrenyer45@gmail. com', '09811741641', 1, '2026-06-16 19:37:47', '2026-06-16 19:38:20'),
+(2, 38, 'renyer', 'pogiako', 'yabutrenyer30@gmail.com', '09811741641', 1, '2026-06-17 13:33:49', '2026-06-18 16:55:35'),
+(3, 39, 'ryzenbay', '12345678', 'yabutrenyer30@gmail.com', '09811741641', 1, '2026-08-24 13:21:10', '2026-08-24 13:21:29');
 
 --
 -- Indexes for dumped tables
@@ -474,43 +495,43 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `archived_bookings`
 --
 ALTER TABLE `archived_bookings`
-  MODIFY `archive_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `archive_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `audit_log`
 --
 ALTER TABLE `audit_log`
-  MODIFY `audit_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `audit_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `notification_log`
 --
 ALTER TABLE `notification_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `payment_transactions`
 --
 ALTER TABLE `payment_transactions`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `receipts`
 --
 ALTER TABLE `receipts`
-  MODIFY `receipt_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `receipt_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `rooms`
@@ -534,7 +555,7 @@ ALTER TABLE `system_settings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
