@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry excluding="Hotel_system_draft2/Hotel_system_draft3/Hotel_system_draft3/HotelSystem/src/|disa/" kind="src" path=""/>
 	<classpathentry kind="src" path="disa"/>
 	<classpathentry kind="src" path="Hotel_system_draft2/Hotel_system_draft3/Hotel_system_draft3/HotelSystem/src"/>
+	<classpathentry kind="lib" path="C:/Users/RENYER YABUT/Downloads/activation-1.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/RENYER YABUT/Downloads/javax.mail-1.6.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/RENYER YABUT/Downloads/javax.mail.jar"/>
+	<classpathentry kind="lib" path="C:/Users/RENYER YABUT/Downloads/mysql-connector-j-9.6.0/mysql-connector-j-9.6.0/mysql-connector-j-9.6.0.jar">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="Hotel_system_draft2/Hotel_system_draft3/Hotel_system_draft3/HotelSystem/bin"/>
 </classpath>
