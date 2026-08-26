@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry excluding="Hotel_system_draft2/Hotel_system_draft3/Hotel_system_draft3/HotelSystem/src/|disa/" kind="src" path=""/>
 	<classpathentry kind="src" path="disa"/>
 	<classpathentry kind="src" path="Hotel_system_draft2/Hotel_system_draft3/Hotel_system_draft3/HotelSystem/src"/>
