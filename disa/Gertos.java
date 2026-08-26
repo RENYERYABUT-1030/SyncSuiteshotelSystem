@@ -1,4 +1,4 @@
-package disa;
+
 
 public class Gertos {
     public static void main(String[] args) {
