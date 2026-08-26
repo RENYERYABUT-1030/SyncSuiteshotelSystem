@@ -1,992 +1,696 @@
 package Hotel_Reservation;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Calendar;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
-import java.sql.*;
-import java.util.Date;
-import java.util.Calendar;
-import java.text.SimpleDateFormat;
-
-/**
- * Enhanced New Booking Panel
- * Bug fixes: SQL injection prevention, date validation, transaction safety
- * Features: Customer search, senior discount, extra guest fees, QR payment option
- */
 public class NewBookingPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private JTextField FNameField;
+
+    private JTextField FNameFIeld;
     private JTextField LNameField;
     private JTextField PNumField;
     private JTextField emailField;
     private JComboBox<String> roomTypeCBX;
     private JComboBox<String> availableRoomCBX;
     private JSpinner checkInSpinner;
-    private JSpinner checkOutSpinner;
+    private JSpinner checkOutSPinner;
     private JTextField txtTotalAmount;
     private JComboBox<String> PMethodCBX;
     private JLabel roomImageLabel;
     private JLabel roomNameLabel;
+    private JSpinner guestCountSpinner;
+    private JCheckBox chckbxSeniorPwd;
     private JLabel lblExtraCharge;
+
     private int currentCustomerId = -1;
 
-    // Guest spinners
-    private JSpinner adultSpinner;
-    private JSpinner seniorPwdSpinner;
-    private JSpinner kidSpinner;
-
-    // Room data
-    private double[] basePrices = {2500.0, 3500.0, 5000.0, 8000.0};
-    private int[] includedGuests = {2, 4, 6, 10};
-    private double[] extraGuestFee = {500.0, 700.0, 1000.0, 1500.0};
+    private static final double[] BASE_PRICES = {2500.0, 3500.0, 5000.0, 8000.0};
+    private static final int[] INCLUDED_GUESTS = {2, 4, 6, 10};
+    private static final double[] EXTRA_GUEST_FEE = {500.0, 700.0, 1000.0, 1500.0};
 
     public NewBookingPanel() {
-        setForeground(new Color(31, 26, 85));
-        setSize(1924, 1083);
-        setLayout(null);
+        this.setForeground(new Color(31, 26, 85));
+        this.setSize(1924, 1083);
+        this.setLayout(null);
 
         JLabel lblNewBooking = new JLabel("CREATE NEW BOOKING");
         lblNewBooking.setForeground(new Color(0, 0, 68));
-        lblNewBooking.setBounds(44, 20, 400, 28);
+        lblNewBooking.setBounds(44, 20, 364, 28);
         lblNewBooking.setFont(new Font("SansSerif", Font.BOLD, 20));
-        add(lblNewBooking);
+        this.add(lblNewBooking);
 
-        // Search existing customer button
-        JButton btnSearchCustomer = new JButton("🔍 Search Customer");
-        btnSearchCustomer.setBounds(239, 56, 241, 28);
+        JButton btnSearchCustomer = new JButton("Search Customer");
+        btnSearchCustomer.setBounds(331, 58, 241, 25);
         btnSearchCustomer.setFont(new Font("SansSerif", Font.BOLD, 12));
         btnSearchCustomer.setBackground(new Color(0, 128, 255));
         btnSearchCustomer.setForeground(Color.WHITE);
-        btnSearchCustomer.setFocusPainted(false);
-        btnSearchCustomer.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnSearchCustomer.addActionListener(e -> showCustomerSearchDialog());
-        add(btnSearchCustomer);
+        this.add(btnSearchCustomer);
 
-        // Customer Information Section
-        JLabel lblCustomerInfo = new JLabel("━━ Customer Information");
-        lblCustomerInfo.setForeground(new Color(0, 0, 68));
-        lblCustomerInfo.setFont(new Font("SansSerif", Font.BOLD, 16));
-        lblCustomerInfo.setBounds(50, 58, 300, 20);
-        add(lblCustomerInfo);
+        JLabel lblcostumerInformation = new JLabel("--Customer Information");
+        lblcostumerInformation.setForeground(new Color(0, 0, 68));
+        lblcostumerInformation.setFont(new Font("SansSerif", Font.BOLD, 18));
+        lblcostumerInformation.setBounds(101, 58, 241, 17);
+        this.add(lblcostumerInformation);
 
-        // First Name
         JLabel lblFirst = new JLabel("First Name:");
-        lblFirst.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblFirst.setBounds(80, 90, 100, 20);
-        add(lblFirst);
+        lblFirst.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblFirst.setBounds(193, 98, 104, 17);
+        this.add(lblFirst);
 
-        FNameField = new JTextField();
-        FNameField.setBounds(190, 88, 250, 24);
-        FNameField.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        FNameField.addKeyListener(new KeyAdapter() {
-            public void keyTyped(KeyEvent e) {
-                char c = e.getKeyChar();
-                if (c >= '0' && c <= '9') e.consume();
-                if (Character.isLetter(c)) e.setKeyChar(Character.toUpperCase(c));
-            }
-        });
-        add(FNameField);
+        FNameFIeld = new JTextField();
+        FNameFIeld.setBounds(331, 93, 241, 21);
+        FNameFIeld.setColumns(10);
+        FNameFIeld.addKeyListener(new UppercaseLettersOnlyAdapter());
+        this.add(FNameFIeld);
 
-        // Last Name
         JLabel lblLastName = new JLabel("Last Name:");
-        lblLastName.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblLastName.setBounds(80, 122, 100, 20);
-        add(lblLastName);
+        lblLastName.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblLastName.setBounds(193, 140, 104, 17);
+        this.add(lblLastName);
+
+        JLabel lblPhoneNumber = new JLabel("Phone Number:");
+        lblPhoneNumber.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblPhoneNumber.setBounds(193, 186, 128, 17);
+        this.add(lblPhoneNumber);
+
+        JLabel lblEmail = new JLabel("Email:");
+        lblEmail.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblEmail.setBounds(200, 236, 121, 17);
+        this.add(lblEmail);
+
+        JLabel lblroomSelection = new JLabel("--Room Selection");
+        lblroomSelection.setForeground(new Color(0, 0, 68));
+        lblroomSelection.setFont(new Font("SansSerif", Font.BOLD, 18));
+        lblroomSelection.setBounds(101, 274, 214, 17);
+        this.add(lblroomSelection);
+
+        JLabel lblRoomType = new JLabel("Room type:");
+        lblRoomType.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblRoomType.setBounds(193, 313, 121, 17);
+        this.add(lblRoomType);
+
+        JLabel lblAvailableRoom = new JLabel("Available Room");
+        lblAvailableRoom.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblAvailableRoom.setBounds(193, 359, 121, 17);
+        this.add(lblAvailableRoom);
+
+        JLabel lblGuestCount = new JLabel("No. of Guests:");
+        lblGuestCount.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblGuestCount.setBounds(193, 401, 121, 17);
+        this.add(lblGuestCount);
+
+        JLabel lbldates = new JLabel("--Dates");
+        lbldates.setForeground(new Color(0, 0, 68));
+        lbldates.setFont(new Font("SansSerif", Font.BOLD, 18));
+        lbldates.setBounds(101, 428, 214, 17);
+        this.add(lbldates);
+
+        JLabel lblCheck = new JLabel("Check-in Date");
+        lblCheck.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblCheck.setBounds(193, 455, 121, 17);
+        this.add(lblCheck);
+
+        JLabel lblCheckoutDate = new JLabel("Check-out Date");
+        lblCheckoutDate.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblCheckoutDate.setBounds(193, 501, 128, 17);
+        this.add(lblCheckoutDate);
+
+        JLabel lblNewLabel = new JLabel("Payment");
+        lblNewLabel.setForeground(new Color(0, 0, 68));
+        lblNewLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        lblNewLabel.setBounds(101, 540, 214, 17);
+        this.add(lblNewLabel);
+
+        JLabel lblPaymentMethod = new JLabel("Payment Method");
+        lblPaymentMethod.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblPaymentMethod.setBounds(193, 610, 147, 17);
+        this.add(lblPaymentMethod);
+
+        JLabel lblCheckOut = new JLabel("Total Amount");
+        lblCheckOut.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblCheckOut.setBounds(193, 648, 121, 17);
+        this.add(lblCheckOut);
 
         LNameField = new JTextField();
-        LNameField.setBounds(190, 120, 250, 24);
-        LNameField.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        LNameField.addKeyListener(new KeyAdapter() {
-            public void keyTyped(KeyEvent e) {
-                char c = e.getKeyChar();
-                if (c >= '0' && c <= '9') e.consume();
-                if (Character.isLetter(c)) e.setKeyChar(Character.toUpperCase(c));
-            }
-        });
-        add(LNameField);
-
-        // Phone Number
-        JLabel lblPhoneNumber = new JLabel("Phone Number:");
-        lblPhoneNumber.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblPhoneNumber.setBounds(80, 154, 110, 20);
-        add(lblPhoneNumber);
+        LNameField.setBounds(331, 140, 241, 21);
+        LNameField.setColumns(10);
+        LNameField.addKeyListener(new UppercaseLettersOnlyAdapter());
+        this.add(LNameField);
 
         PNumField = new JTextField();
-        PNumField.setBounds(190, 152, 250, 24);
-        PNumField.setFont(new Font("SansSerif", Font.PLAIN, 13));
         PNumField.addKeyListener(new KeyAdapter() {
+            @Override
             public void keyTyped(KeyEvent e) {
                 char c = e.getKeyChar();
-                if (!Character.isDigit(c)) e.consume();
-                if (PNumField.getText().length() >= 11) e.consume();
+                if (!Character.isDigit(c)) {
+                    e.consume();
+                }
+                if (PNumField.getText().length() >= 11) {
+                    e.consume();
+                }
             }
         });
-        add(PNumField);
-
-        // Email
-        JLabel lblEmail = new JLabel("Email:");
-        lblEmail.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblEmail.setBounds(80, 186, 100, 20);
-        add(lblEmail);
+        PNumField.setBounds(331, 186, 241, 21);
+        PNumField.setColumns(10);
+        this.add(PNumField);
 
         emailField = new JTextField();
-        emailField.setBounds(190, 184, 250, 24);
-        emailField.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        add(emailField);
-
-        // Room Selection Section
-        JLabel lblRoomSelection = new JLabel("━━ Room Selection");
-        lblRoomSelection.setForeground(new Color(0, 0, 68));
-        lblRoomSelection.setFont(new Font("SansSerif", Font.BOLD, 16));
-        lblRoomSelection.setBounds(50, 220, 300, 20);
-        add(lblRoomSelection);
-
-        JLabel lblRoomType = new JLabel("Room Type:");
-        lblRoomType.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblRoomType.setBounds(80, 250, 100, 20);
-        add(lblRoomType);
+        emailField.setBounds(331, 236, 241, 21);
+        emailField.setColumns(10);
+        this.add(emailField);
 
         String[] roomTypes = {
-            "Standard Room - ₱2,500/day",
-            "Junior Suite - ₱3,500/day",
-            "Executive Suite - ₱5,000/day",
-            "Presidential Suite - ₱8,000/day"
+                "Standard Room - \u20b12,500/day",
+                "Junior suite - \u20b13,500/day",
+                "Executive Suite - \u20b15,000/day",
+                "Presidential Suite - \u20b18,000/day"
         };
         roomTypeCBX = new JComboBox<>(roomTypes);
-        roomTypeCBX.setBounds(190, 248, 250, 26);
-        roomTypeCBX.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        roomTypeCBX.addActionListener(e -> {
-            loadAvailableRooms();
-            calculateTotalAmount();
-            updateRoomImage();
+        roomTypeCBX.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadAvailableRooms();
+                calculateTotalAmount();
+                String selectedRoom = (String) roomTypeCBX.getSelectedItem();
+                String imageFile = "";
+                if (selectedRoom.contains("Standard Room")) {
+                    imageFile = "Standard_room.jpg";
+                    roomNameLabel.setText("Standard Room");
+                } else if (selectedRoom.contains("Junior")) {
+                    roomNameLabel.setText("Junior Suite");
+                    imageFile = "Junior_room.jpg";
+                } else if (selectedRoom.contains("Executive")) {
+                    imageFile = "Executive_room.jpg";
+                    roomNameLabel.setText("Executive Suite");
+                } else if (selectedRoom.contains("Presidential")) {
+                    imageFile = "Presindetial_room.jpg";
+                    roomNameLabel.setText("Presidential Suite");
+                }
+                roomImageLabel.setIcon(createScaledIcon(imageFile, 815, 649));
+            }
         });
-        add(roomTypeCBX);
+        roomTypeCBX.setBounds(331, 310, 241, 26);
+        this.add(roomTypeCBX);
 
-        JLabel lblAvailableRoom = new JLabel("Available Room:");
-        lblAvailableRoom.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblAvailableRoom.setBounds(80, 282, 110, 20);
-        add(lblAvailableRoom);
+        roomNameLabel = new JLabel("");
+        roomNameLabel.setBounds(654, 5, 815, 20);
+        roomNameLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
+        roomNameLabel.setForeground(new Color(0, 0, 68));
+        roomNameLabel.setHorizontalAlignment(JLabel.RIGHT);
+        this.add(roomNameLabel);
+
+        roomImageLabel = new JLabel();
+        roomImageLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+        roomImageLabel.setBounds(654, 35, 848, 698);
+        roomImageLabel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        roomImageLabel.setHorizontalAlignment(JLabel.CENTER);
+        this.add(roomImageLabel);
 
         availableRoomCBX = new JComboBox<>();
-        availableRoomCBX.setBounds(190, 280, 250, 26);
-        availableRoomCBX.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        add(availableRoomCBX);
+        availableRoomCBX.setBounds(331, 356, 241, 26);
+        this.add(availableRoomCBX);
 
-        // Guests Section
-        JLabel lblGuestSection = new JLabel("━━ Guests");
-        lblGuestSection.setForeground(new Color(0, 0, 68));
-        lblGuestSection.setFont(new Font("SansSerif", Font.BOLD, 16));
-        lblGuestSection.setBounds(50, 316, 300, 20);
-        add(lblGuestSection);
+        guestCountSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 20, 1));
+        guestCountSpinner.setBounds(334, 401, 74, 22);
+        guestCountSpinner.addChangeListener(e -> calculateTotalAmount());
+        this.add(guestCountSpinner);
 
-        // Adults
-        JLabel lblAdults = new JLabel("Adults:");
-        lblAdults.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblAdults.setBounds(80, 345, 100, 20);
-        add(lblAdults);
-
-        adultSpinner = new JSpinner(new SpinnerNumberModel(1, 0, 20, 1));
-        adultSpinner.setBounds(190, 343, 70, 24);
-        adultSpinner.addChangeListener(e -> calculateTotalAmount());
-        add(adultSpinner);
-
-        JLabel lblAdultNote = new JLabel("(Full rate)");
-        lblAdultNote.setFont(new Font("SansSerif", Font.ITALIC, 11));
-        lblAdultNote.setForeground(Color.GRAY);
-        lblAdultNote.setBounds(270, 345, 100, 20);
-        add(lblAdultNote);
-
-        // Senior/PWD
-        JLabel lblSeniorPwd = new JLabel("Senior / PWD:");
-        lblSeniorPwd.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblSeniorPwd.setBounds(80, 375, 100, 20);
-        add(lblSeniorPwd);
-
-        seniorPwdSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
-        seniorPwdSpinner.setBounds(190, 373, 70, 24);
-        seniorPwdSpinner.addChangeListener(e -> calculateTotalAmount());
-        add(seniorPwdSpinner);
-
-        JLabel lblSeniorNote = new JLabel("(20% discount)");
-        lblSeniorNote.setFont(new Font("SansSerif", Font.ITALIC, 11));
-        lblSeniorNote.setForeground(new Color(0, 128, 0));
-        lblSeniorNote.setBounds(270, 375, 100, 20);
-        add(lblSeniorNote);
-
-        // Kids
-        JLabel lblKids = new JLabel("Kids:");
-        lblKids.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblKids.setBounds(80, 405, 100, 20);
-        add(lblKids);
-
-        kidSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
-        kidSpinner.setBounds(190, 403, 70, 24);
-        kidSpinner.addChangeListener(e -> calculateTotalAmount());
-        add(kidSpinner);
-
-        JLabel lblKidNote = new JLabel("(Free)");
-        lblKidNote.setFont(new Font("SansSerif", Font.ITALIC, 11));
-        lblKidNote.setForeground(new Color(0, 128, 255));
-        lblKidNote.setBounds(270, 405, 100, 20);
-        add(lblKidNote);
-
-        // Extra charge label
         lblExtraCharge = new JLabel("");
         lblExtraCharge.setFont(new Font("SansSerif", Font.ITALIC, 12));
         lblExtraCharge.setForeground(new Color(224, 27, 36));
-        lblExtraCharge.setBounds(80, 435, 400, 20);
-        add(lblExtraCharge);
+        lblExtraCharge.setBounds(416, 401, 258, 22);
+        this.add(lblExtraCharge);
 
-        // Dates Section
-        JLabel lblDates = new JLabel("━━ Dates");
-        lblDates.setForeground(new Color(0, 0, 68));
-        lblDates.setFont(new Font("SansSerif", Font.BOLD, 16));
-        lblDates.setBounds(50, 460, 300, 20);
-        add(lblDates);
-
-        JLabel lblCheckIn = new JLabel("Check-in Date:");
-        lblCheckIn.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblCheckIn.setBounds(80, 490, 110, 20);
-        add(lblCheckIn);
-
-        JLabel lblCheckOut = new JLabel("Check-out Date:");
-        lblCheckOut.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblCheckOut.setBounds(80, 520, 110, 20);
-        add(lblCheckOut);
-
-        // Date spinners with proper minimum date (today)
         Calendar today = Calendar.getInstance();
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.SECOND, 0);
         today.set(Calendar.MILLISECOND, 0);
-        Date minDate = today.getTime();
+        java.util.Date minDate = today.getTime();
 
         SpinnerDateModel checkInModel = new SpinnerDateModel(minDate, minDate, null, Calendar.DAY_OF_MONTH);
         SpinnerDateModel checkOutModel = new SpinnerDateModel(minDate, minDate, null, Calendar.DAY_OF_MONTH);
 
         checkInSpinner = new JSpinner(checkInModel);
-        checkInSpinner.setBounds(190, 488, 250, 24);
+        checkInSpinner.setBounds(331, 455, 241, 22);
         checkInSpinner.setEditor(new JSpinner.DateEditor(checkInSpinner, "yyyy-MM-dd"));
-        checkInSpinner.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        add(checkInSpinner);
+        this.add(checkInSpinner);
 
-        checkOutSpinner = new JSpinner(checkOutModel);
-        checkOutSpinner.setBounds(190, 518, 250, 24);
-        checkOutSpinner.setEditor(new JSpinner.DateEditor(checkOutSpinner, "yyyy-MM-dd"));
-        checkOutSpinner.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        add(checkOutSpinner);
+        checkOutSPinner = new JSpinner(checkOutModel);
+        checkOutSPinner.setBounds(331, 501, 241, 22);
+        checkOutSPinner.setEditor(new JSpinner.DateEditor(checkOutSPinner, "yyyy-MM-dd"));
+        this.add(checkOutSPinner);
 
         checkInSpinner.addChangeListener(e -> {
             calculateTotalAmount();
             loadAvailableRooms();
         });
-        checkOutSpinner.addChangeListener(e -> {
+        checkOutSPinner.addChangeListener(e -> {
             calculateTotalAmount();
             loadAvailableRooms();
         });
 
-        // Payment Section
-        JLabel lblPayment = new JLabel("━━ Payment");
-        lblPayment.setForeground(new Color(0, 0, 68));
-        lblPayment.setFont(new Font("SansSerif", Font.BOLD, 16));
-        lblPayment.setBounds(50, 555, 300, 20);
-        add(lblPayment);
-
-        JLabel lblPaymentMethod = new JLabel("Payment Method:");
-        lblPaymentMethod.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblPaymentMethod.setBounds(80, 585, 110, 20);
-        add(lblPaymentMethod);
-
-        String[] paymentMethods = {"Cash", "GCash/QR Scan", "QR PH"};
-        PMethodCBX = new JComboBox<>(paymentMethods);
-        PMethodCBX.setBounds(190, 583, 250, 26);
-        PMethodCBX.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        add(PMethodCBX);
-
-        JLabel lblTotal = new JLabel("Total Amount:");
-        lblTotal.setFont(new Font("SansSerif", Font.BOLD, 14));
-        lblTotal.setBounds(80, 620, 110, 25);
-        add(lblTotal);
-
-        txtTotalAmount = new JTextField("₱0.00");
-        txtTotalAmount.setBounds(190, 618, 250, 28);
+        txtTotalAmount = new JTextField();
+        txtTotalAmount.setBounds(331, 648, 241, 21);
         txtTotalAmount.setEditable(false);
-        txtTotalAmount.setFont(new Font("SansSerif", Font.BOLD, 16));
-        txtTotalAmount.setBackground(new Color(255, 255, 220));
-        txtTotalAmount.setHorizontalAlignment(JTextField.RIGHT);
-        add(txtTotalAmount);
+        txtTotalAmount.setFont(new Font("SansSerif", Font.BOLD, 14));
+        this.add(txtTotalAmount);
 
-        // Room Image Display
-        roomNameLabel = new JLabel("Standard Room");
-        roomNameLabel.setBounds(500, 20, 400, 25);
-        roomNameLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
-        roomNameLabel.setForeground(new Color(0, 0, 68));
-        add(roomNameLabel);
+        String[] paymentMethods = {"Cash", "GCash/QR Scan"};
+        PMethodCBX = new JComboBox<>(paymentMethods);
+        PMethodCBX.setBounds(331, 607, 241, 26);
+        this.add(PMethodCBX);
 
-        roomImageLabel = new JLabel();
-        roomImageLabel.setBounds(682, 50, 450, 430);
-        roomImageLabel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-        roomImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        roomImageLabel.setBackground(new Color(240, 240, 240));
-        roomImageLabel.setOpaque(true);
-        add(roomImageLabel);
-
-        // Buttons
-        JButton btnClearForm = new JButton("🗑 Clear Form");
-        btnClearForm.setBounds(80, 665, 160, 32);
+        JButton btnClearForm = new JButton("Clear Form");
+        btnClearForm.addActionListener(e -> clearForm());
         btnClearForm.setForeground(Color.WHITE);
         btnClearForm.setBackground(new Color(224, 27, 36));
-        btnClearForm.setFont(new Font("SansSerif", Font.BOLD, 13));
-        btnClearForm.setFocusPainted(false);
-        btnClearForm.addActionListener(e -> clearForm());
-        add(btnClearForm);
+        btnClearForm.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnClearForm.setBounds(1198, 743, 140, 27);
+        this.add(btnClearForm);
 
-        JButton btnSaveBooking = new JButton("💾 Save Booking");
-        btnSaveBooking.setBounds(260, 665, 180, 32);
+        JButton btnSaveBooking = new JButton("Save Booking");
+        btnSaveBooking.addActionListener(e -> saveBooking());
         btnSaveBooking.setForeground(Color.WHITE);
         btnSaveBooking.setBackground(new Color(46, 194, 126));
-        btnSaveBooking.setFont(new Font("SansSerif", Font.BOLD, 13));
-        btnSaveBooking.setFocusPainted(false);
-        btnSaveBooking.addActionListener(e -> saveBooking());
-        add(btnSaveBooking);
+        btnSaveBooking.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnSaveBooking.setBounds(1358, 743, 140, 27);
+        this.add(btnSaveBooking);
 
-        // Initialize
+        chckbxSeniorPwd = new JCheckBox("Senior / PWD");
+        chckbxSeniorPwd.addActionListener(e -> calculateTotalAmount());
+        chckbxSeniorPwd.setBounds(331, 565, 129, 23);
+        this.add(chckbxSeniorPwd);
+
+        JLabel lblDiscount = new JLabel("Discount");
+        lblDiscount.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblDiscount.setBounds(193, 567, 115, 15);
+        this.add(lblDiscount);
+
         loadAvailableRooms();
-        calculateTotalAmount();
+        roomImageLabel.setIcon(createScaledIcon("Standard_room.jpg", 815, 649));
+        roomNameLabel.setText("Standard Room");
     }
 
-    private void updateRoomImage() {
-        String selectedRoom = (String) roomTypeCBX.getSelectedItem();
-        if (selectedRoom == null) return;
-
-        if (selectedRoom.contains("Standard Room")) {
-            roomNameLabel.setText("Standard Room");
-            roomImageLabel.setIcon(createScaledIcon("Standard room.jpg", 400, 300));
-        } else if (selectedRoom.contains("Junior")) {
-            roomNameLabel.setText("Junior Suite");
-            roomImageLabel.setIcon(createScaledIcon("Junior room.jpg", 400, 300));
-        } else if (selectedRoom.contains("Executive")) {
-            roomNameLabel.setText("Executive Suite");
-            roomImageLabel.setIcon(createScaledIcon("Executive room.jpg", 400, 300));
-        } else if (selectedRoom.contains("Presidential")) {
-            roomNameLabel.setText("Presidential Suite");
-            roomImageLabel.setIcon(createScaledIcon("Presidential room.jpg", 400, 300));
-        }
-    }
-
-    private ImageIcon createScaledIcon(String path, int width, int height) {
-        try {
-            ImageIcon icon = new ImageIcon(path);
-            if (icon.getIconWidth() == -1) {
-                // Return placeholder if image not found
-                return null;
+    /** Shared key adapter: blocks digits, forces letters to uppercase. */
+    private static class UppercaseLettersOnlyAdapter extends KeyAdapter {
+        @Override
+        public void keyTyped(KeyEvent e) {
+            char c = e.getKeyChar();
+            if (c >= '0' && c <= '9') {
+                e.consume();
             }
-            Image img = icon.getImage();
-            Image newImg = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-            return new ImageIcon(newImg);
-        } catch (Exception e) {
-            return null;
+            if (Character.isLetter(c)) {
+                e.setKeyChar(Character.toUpperCase(c));
+            }
         }
     }
 
-    /**
-     * Load available rooms based on selected type and dates
-     * BUG FIX: Properly checks for overlapping bookings
-     */
     private void loadAvailableRooms() {
         availableRoomCBX.removeAllItems();
-
         int typeIndex = roomTypeCBX.getSelectedIndex() + 1;
 
-        // Get selected dates
-        Date checkIn = (Date) checkInSpinner.getValue();
-        Date checkOut = (Date) checkOutSpinner.getValue();
-        java.sql.Date sqlCheckIn = new java.sql.Date(checkIn.getTime());
-        java.sql.Date sqlCheckOut = new java.sql.Date(checkOut.getTime());
+        String sql = "SELECT room_id, room_number FROM rooms WHERE room_type_id = ? AND is_available = 1";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        try (Connection conn = DBConnection.getConnection()) {
-            // BUG FIX: Removed `is_available = 1` filter — that flag gets set to 0 on booking
-            // and is never reliably reset. Availability is correctly determined by checking
-            // for overlapping active bookings instead (the NOT IN subquery below).
-            String sql = "SELECT r.room_id, r.room_number FROM rooms r " +
-                        "WHERE r.room_type_id = ? " +
-                        "AND r.is_maintenance = 0 " +
-                        "AND r.room_id NOT IN (" +
-                        "    SELECT room_id FROM bookings " +
-                        "    WHERE status IN ('Reserved', 'Checked In') " +
-                        "    AND check_in_date < ? AND check_out_date > ?" +
-                        ")";
-
-            PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, typeIndex);
-            ps.setDate(2, sqlCheckOut);   // existing must start before our checkout
-            ps.setDate(3, sqlCheckIn);    // existing must end after our checkin
-
-            ResultSet rs = ps.executeQuery();
-
             boolean found = false;
-            while (rs.next()) {
-                availableRoomCBX.addItem(rs.getInt("room_id") + " - Room " + rs.getString("room_number"));
-                found = true;
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    availableRoomCBX.addItem(rs.getInt("room_id") + " - Room " + rs.getString("room_number"));
+                    found = true;
+                }
             }
-
             if (!found) {
-                availableRoomCBX.addItem("No rooms available for selected dates");
+                availableRoomCBX.addItem("No rooms available");
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error loading rooms: " + e.getMessage());
         }
     }
 
-    /**
-     * Calculate total amount with proper date handling
-     * BUG FIX: Proper calendar date comparison, no time component issues
-     */
     private void calculateTotalAmount() {
         try {
-            Date checkInDate = (Date) checkInSpinner.getValue();
-            Date checkOutDate = (Date) checkOutSpinner.getValue();
-
-            Calendar calIn = Calendar.getInstance();
-            calIn.setTime(checkInDate);
-            calIn.set(Calendar.HOUR_OF_DAY, 0);
-            calIn.set(Calendar.MINUTE, 0);
-            calIn.set(Calendar.SECOND, 0);
-            calIn.set(Calendar.MILLISECOND, 0);
-
-            Calendar calOut = Calendar.getInstance();
-            calOut.setTime(checkOutDate);
-            calOut.set(Calendar.HOUR_OF_DAY, 0);
-            calOut.set(Calendar.MINUTE, 0);
-            calOut.set(Calendar.SECOND, 0);
-            calOut.set(Calendar.MILLISECOND, 0);
-
-            long days = (calOut.getTimeInMillis() - calIn.getTimeInMillis()) / (1000 * 60 * 60 * 24);
-
-            if (days <= 0) {
+            long days = daysBetween();
+            if (days <= 0L) {
                 txtTotalAmount.setText("Invalid Dates");
-                lblExtraCharge.setText("Check-out must be after check-in");
-                return;
-            }
-
-            // BUG FIX: Check max advance booking (90 days)
-            Calendar maxDate = Calendar.getInstance();
-            maxDate.add(Calendar.DAY_OF_MONTH, 90);
-            if (calIn.after(maxDate)) {
-                txtTotalAmount.setText("Max 90 days advance");
-                lblExtraCharge.setText("Booking too far in advance");
+                lblExtraCharge.setText("");
                 return;
             }
 
             int typeIndex = roomTypeCBX.getSelectedIndex();
-            if (typeIndex < 0) typeIndex = 0;
+            int actualGuests = (Integer) guestCountSpinner.getValue();
+            int allowedBaseGuests = INCLUDED_GUESTS[typeIndex];
 
-            int adults = (int) adultSpinner.getValue();
-            int seniors = (int) seniorPwdSpinner.getValue();
-            int kids = (int) kidSpinner.getValue();
-            int totalGuests = adults + seniors + kids;
+            double total = days * BASE_PRICES[typeIndex];
+            int extraGuests = Math.max(0, actualGuests - allowedBaseGuests);
+            double extraChargeTotal = extraGuests * EXTRA_GUEST_FEE[typeIndex] * days;
 
-            if (totalGuests == 0) {
-                txtTotalAmount.setText("₱0.00");
-                lblExtraCharge.setText("Add at least 1 guest");
-                return;
+            if (extraGuests > 0) {
+                lblExtraCharge.setText(String.format("(+ \u20b1%,.2f for %d extra guests)", extraChargeTotal, extraGuests));
+            } else {
+                lblExtraCharge.setText("");
             }
 
-            // Base room cost
-            double baseRoomCost = days * basePrices[typeIndex];
-
-            // Extra guest surcharge
-            int allowedBase = includedGuests[typeIndex];
-            int extraHeads = Math.max(0, totalGuests - allowedBase);
-            double extraChargeTotal = extraHeads * extraGuestFee[typeIndex] * days;
-
-            // Senior discount
-            int payingGuests = adults + seniors;
-            double seniorDiscount = 0.0;
-            if (payingGuests > 0 && seniors > 0) {
-                double totalBeforeDiscount = baseRoomCost + extraChargeTotal;
-                double seniorFraction = (double) seniors / payingGuests;
-                seniorDiscount = totalBeforeDiscount * seniorFraction * 0.20;
-            }
-
-            double total = baseRoomCost + extraChargeTotal - seniorDiscount;
-
-            // Display breakdown
-            StringBuilder note = new StringBuilder();
-            note.append(days).append(" night(s) @ ₱").append(String.format("%,.0f", basePrices[typeIndex])).append("/night");
-            if (extraHeads > 0) {
-                note.append(" | +₱").append(String.format("%,.0f", extraChargeTotal)).append(" extra guest fee");
-            }
-            if (seniorDiscount > 0) {
-                note.append(" | -₱").append(String.format("%,.0f", seniorDiscount)).append(" senior discount");
-            }
-            lblExtraCharge.setText(note.toString());
-            lblExtraCharge.setForeground(new Color(0, 100, 0));
-
-            txtTotalAmount.setText("₱" + String.format("%,.2f", total));
-
+            total += extraChargeTotal;
+            total = applyDiscount(total);
+            txtTotalAmount.setText("\u20b1" + String.format("%,.2f", total));
         } catch (Exception e) {
             txtTotalAmount.setText("Error");
-            lblExtraCharge.setText("");
         }
     }
 
-    /**
-     * Clear all form fields
-     */
-    private void clearForm() {
-        FNameField.setText("");
-        LNameField.setText("");
-        PNumField.setText("");
-        emailField.setText("");
-        roomTypeCBX.setSelectedIndex(0);
-        PMethodCBX.setSelectedIndex(0);
-
-        Calendar today = Calendar.getInstance();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-        checkInSpinner.setValue(today.getTime());
-        checkOutSpinner.setValue(today.getTime());
-
-        txtTotalAmount.setText("₱0.00");
-        lblExtraCharge.setText("");
-        adultSpinner.setValue(1);
-        seniorPwdSpinner.setValue(0);
-        kidSpinner.setValue(0);
-        currentCustomerId = -1;
-        FNameField.setEditable(true);
-        LNameField.setEditable(true);
-        loadAvailableRooms();
-    }
-
-    /**
-     * Save booking with full validation and transaction safety
-     * BUG FIX: Proper transaction handling, input validation, SQL injection prevention
-     */
-    private void saveBooking() {
-        System.out.println("=== SAVE BOOKING STARTED ===");
-
-        // STEP 1: Validate empty fields
-        String firstName = FNameField.getText().trim();
-        String lastName = LNameField.getText().trim();
-        String phone = PNumField.getText().trim();
-        String email = emailField.getText().trim();
-
-        System.out.println("STEP 1 - Fields: firstName='" + firstName + "' lastName='" + lastName + "' phone='" + phone + "' email='" + email + "'");
-
-        if (firstName.isEmpty() || lastName.isEmpty() || phone.isEmpty() || email.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill in all customer information.", 
-                "Validation Error", JOptionPane.WARNING_MESSAGE);
-            System.out.println("STEP 1 FAILED - Empty field detected");
-            return;
-        }
-        System.out.println("STEP 1 PASSED");
-
-        // STEP 2: Validate phone
-        System.out.println("STEP 2 - Phone validation: '" + phone + "' matches=" + phone.matches("\\d{10,11}"));
-        if (!phone.matches("\\d{10,11}")) {
-            JOptionPane.showMessageDialog(this, "Phone must be 10-11 digits.", 
-                "Validation Error", JOptionPane.WARNING_MESSAGE);
-            System.out.println("STEP 2 FAILED");
-            return;
-        }
-        System.out.println("STEP 2 PASSED");
-
-        // STEP 3: Validate email
-        System.out.println("STEP 3 - Email validation: '" + email + "'");
-        if (!email.contains("@") || !email.contains(".") || email.indexOf("@") > email.lastIndexOf(".")) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid email address.", 
-                "Validation Error", JOptionPane.WARNING_MESSAGE);
-            System.out.println("STEP 3 FAILED");
-            return;
-        }
-        System.out.println("STEP 3 PASSED");
-
-        // STEP 4: Validate guests
-        int adults = (int) adultSpinner.getValue();
-        int seniors = (int) seniorPwdSpinner.getValue();
-        int kids = (int) kidSpinner.getValue();
-        int totalGuests = adults + seniors + kids;
-
-        System.out.println("STEP 4 - Guests: adults=" + adults + " seniors=" + seniors + " kids=" + kids + " total=" + totalGuests);
-        if (totalGuests == 0) {
-            JOptionPane.showMessageDialog(this, "Please add at least 1 guest.", 
-                "Validation Error", JOptionPane.WARNING_MESSAGE);
-            System.out.println("STEP 4 FAILED");
-            return;
-        }
-        System.out.println("STEP 4 PASSED");
-
-        // STEP 5: Validate room selection
-        String roomEntry = (String) availableRoomCBX.getSelectedItem();
-        System.out.println("STEP 5 - Room entry: '" + roomEntry + "'");
-        if (roomEntry == null || roomEntry.startsWith("No rooms")) {
-            JOptionPane.showMessageDialog(this, "No available room selected.", 
-                "Validation Error", JOptionPane.WARNING_MESSAGE);
-            System.out.println("STEP 5 FAILED - No room");
-            return;
-        }
-
-        int roomId;
-        try {
-            roomId = Integer.parseInt(roomEntry.split(" - ")[0].trim());
-            System.out.println("STEP 5 - Parsed roomId=" + roomId);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Invalid room selection: '" + roomEntry + "'\nCould not parse Room ID.", 
-                "Error", JOptionPane.ERROR_MESSAGE);
-            System.out.println("STEP 5 FAILED - Parse error on: '" + roomEntry + "'");
-            return;
-        }
-        System.out.println("STEP 5 PASSED");
-
-        // STEP 6: Validate and process dates
-        Date checkIn = (Date) checkInSpinner.getValue();
-        Date checkOut = (Date) checkOutSpinner.getValue();
+    /** Returns the whole-day difference between check-in and check-out, normalized to midnight. */
+    private long daysBetween() {
+        java.util.Date checkInDate = (java.util.Date) checkInSpinner.getValue();
+        java.util.Date checkOutDate = (java.util.Date) checkOutSPinner.getValue();
 
         Calendar calIn = Calendar.getInstance();
-        calIn.setTime(checkIn);
+        calIn.setTime(checkInDate);
         calIn.set(Calendar.HOUR_OF_DAY, 0);
         calIn.set(Calendar.MINUTE, 0);
         calIn.set(Calendar.SECOND, 0);
         calIn.set(Calendar.MILLISECOND, 0);
 
         Calendar calOut = Calendar.getInstance();
-        calOut.setTime(checkOut);
+        calOut.setTime(checkOutDate);
         calOut.set(Calendar.HOUR_OF_DAY, 0);
         calOut.set(Calendar.MINUTE, 0);
         calOut.set(Calendar.SECOND, 0);
         calOut.set(Calendar.MILLISECOND, 0);
 
-        long days = (calOut.getTimeInMillis() - calIn.getTimeInMillis()) / (1000 * 60 * 60 * 24);
-        System.out.println("STEP 6 - Dates: checkIn=" + checkIn + " checkOut=" + checkOut + " days=" + days);
+        return (calOut.getTimeInMillis() - calIn.getTimeInMillis()) / 86400000L;
+    }
 
-        if (days <= 0) {
-            JOptionPane.showMessageDialog(this, "Check-out must be after check-in.", 
-                "Validation Error", JOptionPane.WARNING_MESSAGE);
-            System.out.println("STEP 6 FAILED - days <= 0");
+    private void clearForm() {
+        FNameFIeld.setText("");
+        LNameField.setText("");
+        PNumField.setText("");
+        emailField.setText("");
+        roomTypeCBX.setSelectedIndex(0);
+        PMethodCBX.setSelectedIndex(0);
+        checkInSpinner.setValue(new java.util.Date());
+        checkOutSPinner.setValue(new java.util.Date());
+        txtTotalAmount.setText("\u20b1 0.00");
+        roomImageLabel.setIcon(null);
+        roomNameLabel.setText("");
+        guestCountSpinner.setValue(1);
+        chckbxSeniorPwd.setSelected(false);
+        lblExtraCharge.setText("");
+        currentCustomerId = -1;
+        FNameFIeld.setEditable(true);
+        LNameField.setEditable(true);
+    }
+
+    private void saveBooking() {
+        if (FNameFIeld.getText().trim().isEmpty() || LNameField.getText().trim().isEmpty()
+                || PNumField.getText().trim().isEmpty() || emailField.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all customer information.",
+                    "Validation Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Check max stay (30 days)
-        if (days > 30) {
-            JOptionPane.showMessageDialog(this, "Maximum stay is 30 days.", 
-                "Validation Error", JOptionPane.WARNING_MESSAGE);
-            System.out.println("STEP 6 FAILED - days > 30");
+        String phone = PNumField.getText().trim();
+        if (!phone.matches("\\d{10,11}")) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid phone number (10-11 digits).",
+                    "Validation Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        System.out.println("STEP 6 PASSED");
 
-        java.sql.Date sqlCheckIn = new java.sql.Date(calIn.getTimeInMillis());
-        java.sql.Date sqlCheckOut = new java.sql.Date(calOut.getTimeInMillis());
+        String email = emailField.getText().trim();
+        if (!email.contains("@") || !email.contains(".")) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid email address.",
+                    "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (currentCustomerId != -1 && hasActiveBooking(currentCustomerId)) {
+            return; // message already shown inside hasActiveBooking
+        }
+
+        String roomEntry = (String) availableRoomCBX.getSelectedItem();
+        if (roomEntry == null || roomEntry.startsWith("No rooms")) {
+            JOptionPane.showMessageDialog(this, "No available room selected.",
+                    "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        int roomId = Integer.parseInt(roomEntry.split(" - ")[0].trim());
+
+        if (!isRoomStillAvailable(roomId, roomEntry)) {
+            return; // message already shown inside isRoomStillAvailable
+        }
+
+        long days = daysBetween();
+        if (days <= 0L) {
+            JOptionPane.showMessageDialog(this, "Check-out must be after check-in.",
+                    "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Calendar calIn = Calendar.getInstance();
+        calIn.setTime((java.util.Date) checkInSpinner.getValue());
+        calIn.set(Calendar.HOUR_OF_DAY, 0);
+        calIn.set(Calendar.MINUTE, 0);
+        calIn.set(Calendar.SECOND, 0);
+        calIn.set(Calendar.MILLISECOND, 0);
+
+        Calendar calOut = Calendar.getInstance();
+        calOut.setTime((java.util.Date) checkOutSPinner.getValue());
+        calOut.set(Calendar.HOUR_OF_DAY, 0);
+        calOut.set(Calendar.MINUTE, 0);
+        calOut.set(Calendar.SECOND, 0);
+        calOut.set(Calendar.MILLISECOND, 0);
+
+        int typeIndex = roomTypeCBX.getSelectedIndex();
+        int actualGuests = (Integer) guestCountSpinner.getValue();
+        int allowedBaseGuests = INCLUDED_GUESTS[typeIndex];
+        int extraGuests = Math.max(0, actualGuests - allowedBaseGuests);
+
+        double baseTotal = BASE_PRICES[typeIndex] * days;
+        double extraChargeTotal = extraGuests * EXTRA_GUEST_FEE[typeIndex] * days;
+        double total = applyDiscount(baseTotal + extraChargeTotal);
+
+        Date sqlCheckIn = new Date(calIn.getTimeInMillis());
+        Date sqlCheckOut = new Date(calOut.getTimeInMillis());
         String payment = (String) PMethodCBX.getSelectedItem();
 
-        // STEP 7: Calculate total
-        int typeIndex = roomTypeCBX.getSelectedIndex();
-        int allowedBase = includedGuests[typeIndex];
-        int extraHeads = Math.max(0, totalGuests - allowedBase);
-
-        double baseRoomCost = basePrices[typeIndex] * days;
-        double extraChargeTotal = extraHeads * extraGuestFee[typeIndex] * days;
-
-        int payingGuests = adults + seniors;
-        double seniorDiscount = 0.0;
-        if (payingGuests > 0 && seniors > 0) {
-            double totalBeforeDiscount = baseRoomCost + extraChargeTotal;
-            double seniorFraction = (double) seniors / payingGuests;
-            seniorDiscount = totalBeforeDiscount * seniorFraction * 0.20;
-        }
-
-        double total = baseRoomCost + extraChargeTotal - seniorDiscount;
-
-        // KUNIN ANG AMOUNT AT PAYMENT METHOD
-        String selectedPayment = (String) PMethodCBX.getSelectedItem();
-        // BUG FIX 1: Use the computed `total` directly — never parse the display field
-        //            (it has a ₱ sign and commas that break Double.parseDouble).
-        // BUG FIX 2: Match the actual combo-box item text "GCash/QR Scan", not "GCash"/"Maya".
-        // BUG FIX 4: This block used to have no try/catch. If ServicesManager.generateQRPhCode()
-        //            threw anything (timeout, no internet, bad API response, etc.) the exception
-        //            propagated straight out of saveBooking() and STEP 8 below — the actual DB
-        //            insert — never ran. That made a flaky/offline QR API look like "Save Booking"
-        //            was silently doing nothing. Now any failure here is caught and logged, and we
-        //            still fall through to saving the booking.
-        if (selectedPayment.equals("GCash/QR Scan") || selectedPayment.equals("QR PH")) {
-            try {
-                // Generate Random Reference No
-                String refNo = "SYNC" + (int)(Math.random() * 99999);
-
-                // Call the QR API
-                javax.swing.ImageIcon qrCode = ServicesManager.generateQRPhCode(total, refNo);
-
-                if (qrCode != null) {
-                    javax.swing.JOptionPane.showMessageDialog(this,
-                        "Please scan this QR Ph Code using your GCash or Maya app to pay ₱"
-                        + String.format("%,.2f", total) + ".\nReference: " + refNo,
-                        "Scan to Pay",
-                        javax.swing.JOptionPane.INFORMATION_MESSAGE,
-                        qrCode);
-                } else {
-                    javax.swing.JOptionPane.showMessageDialog(this,
-                        "Could not generate QR code. Please check your internet connection.",
-                        "QR Error", javax.swing.JOptionPane.WARNING_MESSAGE);
-                }
-            } catch (Exception qrEx) {
-                System.out.println("STEP 7b - QR generation threw an exception, continuing to save anyway: " + qrEx.getMessage());
-                qrEx.printStackTrace();
-                javax.swing.JOptionPane.showMessageDialog(this,
-                    "Could not generate QR code (" + qrEx.getMessage() + "). The booking will still be saved.",
-                    "QR Error", javax.swing.JOptionPane.WARNING_MESSAGE);
-            }
-        }
-
-        // STEP 8: Save to database with transaction
-        System.out.println("STEP 8 - Attempting DB connection...");
-        Connection conn = null;
-        try {
-            conn = DBConnection.getConnection();
-            System.out.println("STEP 8 - DB connected. currentCustomerId=" + currentCustomerId);
+        try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
+            try {
+                int finalCustomerId = currentCustomerId;
 
-            // Check for existing active booking (only for returning customers)
-            if (currentCustomerId != -1) {
-                PreparedStatement checkPs = conn.prepareStatement(
-                    "SELECT b.booking_id, r.room_number, b.status FROM bookings b " +
-                    "JOIN rooms r ON b.room_id = r.room_id " +
-                    "WHERE b.customer_id = ? AND b.status IN ('Reserved', 'Checked In')");
-                checkPs.setInt(1, currentCustomerId);
-                ResultSet checkRs = checkPs.executeQuery();
-
-                if (checkRs.next()) {
-                    String blockedRoom = checkRs.getString("room_number");
-                    String blockedStatus = checkRs.getString("status");
-                    conn.rollback();
-                    conn.setAutoCommit(true);
-                    conn.close();
-                    conn = null;
-                    JOptionPane.showMessageDialog(this,
-                        "This customer already has an active booking at Room " + blockedRoom +
-                        " (Status: " + blockedStatus + ").\nCannot create a new booking.",
-                        "Booking Blocked", JOptionPane.WARNING_MESSAGE);
-                    return;
+                if (finalCustomerId == -1) {
+                    String custSQL = "INSERT INTO customers (first_name, last_name, phone_number, email, created_at) VALUES (?,?,?,?, NOW())";
+                    try (PreparedStatement custPS = conn.prepareStatement(custSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                        custPS.setString(1, FNameFIeld.getText().trim());
+                        custPS.setString(2, LNameField.getText().trim());
+                        custPS.setString(3, phone);
+                        custPS.setString(4, email);
+                        custPS.executeUpdate();
+                        try (ResultSet keys = custPS.getGeneratedKeys()) {
+                            if (keys.next()) {
+                                finalCustomerId = keys.getInt(1);
+                            }
+                        }
+                    }
+                } else {
+                    String updateSQL = "UPDATE customers SET phone_number = ?, email = ? WHERE customer_id = ?";
+                    try (PreparedStatement updatePS = conn.prepareStatement(updateSQL)) {
+                        updatePS.setString(1, phone);
+                        updatePS.setString(2, email);
+                        updatePS.setInt(3, finalCustomerId);
+                        updatePS.executeUpdate();
+                    }
                 }
-            }
 
-            // Double-check room is not under maintenance and not already booked for these dates
-            System.out.println("STEP 8 - Checking room availability for roomId=" + roomId);
-            PreparedStatement roomCheckPs = conn.prepareStatement(
-                "SELECT r.room_id FROM rooms r WHERE r.room_id = ? AND r.is_maintenance = 0 " +
-                "AND r.room_id NOT IN (" +
-                "    SELECT room_id FROM bookings " +
-                "    WHERE status IN ('Reserved', 'Checked In') " +
-                "    AND check_in_date < ? AND check_out_date > ?" +
-                ")");
-            roomCheckPs.setInt(1, roomId);
-            roomCheckPs.setDate(2, sqlCheckOut);
-            roomCheckPs.setDate(3, sqlCheckIn);
-            ResultSet roomRs = roomCheckPs.executeQuery();
-            boolean roomFound = roomRs.next();
-            System.out.println("STEP 8 - roomAvailable=" + roomFound);
-            if (!roomFound) {
-                conn.rollback();
-                conn.setAutoCommit(true);
-                conn.close();
-                conn = null;
+                String bookSQL = "INSERT INTO bookings (customer_id, room_id, check_in_date, check_out_date, total_amount, payment_method, status) VALUES (?,?,?,?,?,?, 'Reserved')";
+                try (PreparedStatement bookPS = conn.prepareStatement(bookSQL)) {
+                    bookPS.setInt(1, finalCustomerId);
+                    bookPS.setInt(2, roomId);
+                    bookPS.setDate(3, sqlCheckIn);
+                    bookPS.setDate(4, sqlCheckOut);
+                    bookPS.setDouble(5, total);
+                    bookPS.setString(6, payment);
+                    bookPS.executeUpdate();
+                }
+
+                try (PreparedStatement roomPS = conn.prepareStatement("UPDATE rooms SET is_available = 0 WHERE room_id = ?")) {
+                    roomPS.setInt(1, roomId);
+                    roomPS.executeUpdate();
+                }
+
+                conn.commit();
                 JOptionPane.showMessageDialog(this,
-                    "Room is no longer available. Please select another room.",
-                    "Room Unavailable", JOptionPane.WARNING_MESSAGE);
+                        String.format("\u2705 Booking saved!\nCustomer: %s %s\nTotal: \u20b1%,.2f",
+                                FNameFIeld.getText(), LNameField.getText(), total),
+                        "Booking Confirmed", JOptionPane.INFORMATION_MESSAGE);
+                clearForm();
                 loadAvailableRooms();
-                return;
+            } catch (SQLException ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(true);
             }
-
-            // Insert or update customer
-            int finalCustomerId = currentCustomerId;
-            if (finalCustomerId == -1) {
-                PreparedStatement custPs = conn.prepareStatement(
-                    "INSERT INTO customers (first_name, last_name, phone_number, email, created_at) " +
-                    "VALUES (?,?,?,?, NOW())", Statement.RETURN_GENERATED_KEYS);
-                custPs.setString(1, firstName);
-                custPs.setString(2, lastName);
-                custPs.setString(3, phone);
-                custPs.setString(4, email);
-                custPs.executeUpdate();
-
-                ResultSet keys = custPs.getGeneratedKeys();
-                if (keys.next()) finalCustomerId = keys.getInt(1);
-            } else {
-                // Update customer info
-                PreparedStatement updatePs = conn.prepareStatement(
-                    "UPDATE customers SET phone_number = ?, email = ? WHERE customer_id = ?");
-                updatePs.setString(1, phone);
-                updatePs.setString(2, email);
-                updatePs.setInt(3, finalCustomerId);
-                updatePs.executeUpdate();
-            }
-
-            System.out.println("STEP 8 - Inserting booking. finalCustomerId=" + finalCustomerId + " roomId=" + roomId + " total=" + total);
-            // Insert booking
-            PreparedStatement bookPs = conn.prepareStatement(
-                "INSERT INTO bookings (customer_id, room_id, check_in_date, check_out_date, " +
-                "total_amount, payment_method, status, adults, seniors, kids, " +
-                "senior_discount, extra_guest_charge) " +
-                "VALUES (?,?,?,?,?,?, 'Reserved',?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-            bookPs.setInt(1, finalCustomerId);
-            bookPs.setInt(2, roomId);
-            bookPs.setDate(3, sqlCheckIn);
-            bookPs.setDate(4, sqlCheckOut);
-            bookPs.setDouble(5, total);
-            bookPs.setString(6, payment);
-            bookPs.setInt(7, adults);
-            bookPs.setInt(8, seniors);
-            bookPs.setInt(9, kids);
-            bookPs.setDouble(10, seniorDiscount);
-            bookPs.setDouble(11, extraChargeTotal);
-            bookPs.executeUpdate();
-
-            ResultSet bookKeys = bookPs.getGeneratedKeys();
-            int bookingId = 0;
-            if (bookKeys.next()) bookingId = bookKeys.getInt(1);
-
-            // BUG FIX: Removed UPDATE rooms SET is_available = 0 here.
-            // Availability is now determined dynamically by the booking overlap query
-            // in loadAvailableRooms(), so this static flag update is not needed and
-            // was causing rooms to never appear as available again after any booking.
-
-            // Update customer visit count
-            PreparedStatement visitPs = conn.prepareStatement(
-                "UPDATE customers SET total_visits = total_visits + 1 WHERE customer_id = ?");
-            visitPs.setInt(1, finalCustomerId);
-            visitPs.executeUpdate();
-
-            // If QR payment selected, create transaction record
-            if (payment.equals("QR PH")) {
-                PreparedStatement qrPs = conn.prepareStatement(
-                    "INSERT INTO payment_transactions (booking_id, customer_id, amount, payment_method, qr_reference, transaction_status) " +
-                    "VALUES (?,?,?,?,?, 'Pending')");
-                qrPs.setInt(1, bookingId);
-                qrPs.setInt(2, finalCustomerId);
-                qrPs.setDouble(3, total);
-                qrPs.setString(4, "QR PH");
-                qrPs.setString(5, "QRPH-" + System.currentTimeMillis());
-                qrPs.executeUpdate();
-            }
-
-            conn.commit();
-            System.out.println("STEP 8 - COMMIT SUCCESS. bookingId=" + bookingId);
-
-            // Show success confirmation
-            JOptionPane.showMessageDialog(this,
-                "Booking saved successfully!\nBooking ID: " + bookingId,
-                "Booking Confirmed", JOptionPane.INFORMATION_MESSAGE);
-
-           // ==========================================
-// STEP 3: SMS NOTIFICATION AFTER SUCCESSFUL BOOKING
-// ==========================================
-try {
-    // BUG FIX 3: Use the already-validated local variables (firstName, phone, total)
-    //            instead of re-reading the display fields (which may have stale/formatted text).
-    String smsMessage = "Hi " + firstName + "! Confirmed na ang booking mo sa Sync Suites Hotel."
-                      + " Amount: PHP " + String.format("%,.2f", total) + ". Thank you!";
-
-    ServicesManager.sendSMSAlert(phone, smsMessage);
-
-    System.out.println("✅ SMS Triggered para kay: " + firstName);
-} catch (Exception smsEx) {
-    System.err.println("❌ Failed to send SMS: " + smsEx.getMessage());
-}
-// ==========================================
-            clearForm();
-
         } catch (SQLException ex) {
-            System.out.println("STEP 8 FAILED - SQLException: " + ex.getMessage());
-            ex.printStackTrace();
-            if (conn != null) {
-                try { conn.rollback(); } catch (SQLException e) { /* ignore */ }
-            }
-            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(), 
-                "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception ex) {
-            System.out.println("STEP 8 FAILED - Unexpected Exception: " + ex.getMessage());
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Unexpected error: " + ex.getMessage(), 
-                "Error", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            if (conn != null) {
-                try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) { /* ignore */ }
-            }
+            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    /**
-     * Search customer dialog
-     */
+    /** Returns true (and shows a dialog) if the customer already has a Reserved/Checked In booking. */
+    private boolean hasActiveBooking(int customerId) {
+        String checkSQL = "SELECT b.booking_id, r.room_number, b.status FROM bookings b "
+                + "JOIN rooms r ON b.room_id = r.room_id "
+                + "WHERE b.customer_id = ? AND b.status IN ('Reserved', 'Checked In')";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement checkPS = conn.prepareStatement(checkSQL)) {
+
+            checkPS.setInt(1, customerId);
+            try (ResultSet checkRS = checkPS.executeQuery()) {
+                if (checkRS.next()) {
+                    String roomNum = checkRS.getString("room_number");
+                    String status = checkRS.getString("status");
+                    JOptionPane.showMessageDialog(this,
+                            "This customer already has an active booking at Room " + roomNum
+                                    + " (Status: " + status + ").\nCannot create a new booking while a reservation or check-in is active.",
+                            "Booking Blocked", JOptionPane.ERROR_MESSAGE);
+                    return true;
+                }
+            }
+            return false;
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error checking customer status: " + ex.getMessage());
+            return true; // fail safe: block the booking if we couldn't verify
+        }
+    }
+
+    /** Returns true if the room is still available; shows a dialog and refreshes the list otherwise. */
+    private boolean isRoomStillAvailable(int roomId, String roomEntry) {
+        String sql = "SELECT is_available FROM rooms WHERE room_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, roomId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next() && rs.getInt("is_available") == 0) {
+                    JOptionPane.showMessageDialog(this,
+                            "Room " + roomEntry + " was just taken by another booking.\nPlease select a different room.",
+                            "Room No Longer Available", JOptionPane.ERROR_MESSAGE);
+                    loadAvailableRooms();
+                    return false;
+                }
+            }
+            return true;
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error checking room availability: " + ex.getMessage());
+            return false;
+        }
+    }
+
+    private ImageIcon createScaledIcon(String path, int width, int height) {
+        java.net.URL imgURL = getClass().getResource("images/" + path);
+        if (imgURL == null) {
+            System.out.println("Warning: Could not find image at /images/" + path);
+            return null;
+        }
+        ImageIcon icon = new ImageIcon(imgURL);
+        Image img = icon.getImage();
+        Image newImg = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        return new ImageIcon(newImg);
+    }
+
+    private double applyDiscount(double subTotal) {
+        if (chckbxSeniorPwd.isSelected()) {
+            return subTotal - subTotal * 0.2;
+        }
+        return subTotal;
+    }
+
     private void showCustomerSearchDialog() {
         JDialog searchDialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Search Customer", true);
-        searchDialog.setSize(550, 400);
+        searchDialog.setSize(500, 350);
         searchDialog.setLocationRelativeTo(this);
         searchDialog.getContentPane().setLayout(new BorderLayout());
 
         JPanel topPanel = new JPanel(new FlowLayout());
         JTextField txtSearch = new JTextField(20);
-        txtSearch.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        JButton btnSearch = new JButton("🔍 Search");
-        btnSearch.setBackground(new Color(70, 130, 180));
-        btnSearch.setForeground(Color.WHITE);
+        JButton btnSearch = new JButton("Search");
         topPanel.add(new JLabel("Name:"));
         topPanel.add(txtSearch);
         topPanel.add(btnSearch);
-        searchDialog.getContentPane().add(topPanel, BorderLayout.NORTH);
+        searchDialog.getContentPane().add((Component) topPanel, BorderLayout.NORTH);
 
-        txtSearch.addKeyListener(new KeyAdapter() {
-            public void keyTyped(KeyEvent e) {
-                char c = e.getKeyChar();
-                if (c >= '0' && c <= '9') e.consume();
-                if (Character.isLetter(c)) e.setKeyChar(Character.toUpperCase(c));
-            }
-        });
+        txtSearch.addKeyListener(new UppercaseLettersOnlyAdapter());
 
-        String[] columns = {"ID", "First Name", "Last Name", "Phone", "Email", "Visits"};
+        String[] columns = {"ID", "First Name", "Last Name", "Phone"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
-            public boolean isCellEditable(int row, int column) { return false; }
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
         };
         JTable table = new JTable(model);
-        table.setRowHeight(25);
-        table.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        searchDialog.getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);
+        searchDialog.getContentPane().add((Component) new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel();
-        JButton btnSelect = new JButton("✓ Select Customer");
-        btnSelect.setBackground(new Color(46, 194, 126));
-        btnSelect.setForeground(Color.WHITE);
-        btnSelect.setFont(new Font("SansSerif", Font.BOLD, 13));
+        JButton btnSelect = new JButton("Select Customer");
         bottomPanel.add(btnSelect);
-        searchDialog.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
+        searchDialog.getContentPane().add((Component) bottomPanel, BorderLayout.SOUTH);
 
         btnSearch.addActionListener(e -> {
             model.setRowCount(0);
             String keyword = "%" + txtSearch.getText().trim() + "%";
+            String sql = "SELECT customer_id, first_name, last_name, phone_number, email FROM customers "
+                    + "WHERE first_name LIKE ? OR last_name LIKE ?";
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            try (Connection conn = DBConnection.getConnection()) {
-                String sql = "SELECT customer_id, first_name, last_name, phone_number, email, total_visits " +
-                            "FROM customers WHERE first_name LIKE ? OR last_name LIKE ? OR phone_number LIKE ?";
-                PreparedStatement ps = conn.prepareStatement(sql);
                 ps.setString(1, keyword);
                 ps.setString(2, keyword);
-                ps.setString(3, keyword);
-                ResultSet rs = ps.executeQuery();
-
-                while (rs.next()) {
-                    model.addRow(new Object[]{
-                        rs.getInt("customer_id"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("phone_number"),
-                        rs.getString("email"),
-                        rs.getInt("total_visits")
-                    });
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        model.addRow(new Object[]{
+                                rs.getInt("customer_id"),
+                                rs.getString("first_name"),
+                                rs.getString("last_name"),
+                                rs.getString("phone_number")
+                        });
+                    }
                 }
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(searchDialog, "Search Error: " + ex.getMessage());
@@ -995,32 +699,33 @@ try {
 
         btnSelect.addActionListener(e -> {
             int selectedRow = table.getSelectedRow();
-            if (selectedRow != -1) {
-                currentCustomerId = (int) model.getValueAt(selectedRow, 0);
+            if (selectedRow == -1) {
+                return;
+            }
+            currentCustomerId = (Integer) model.getValueAt(selectedRow, 0);
 
-                try (Connection conn = DBConnection.getConnection()) {
-                    PreparedStatement ps = conn.prepareStatement("SELECT * FROM customers WHERE customer_id = ?");
-                    ps.setInt(1, currentCustomerId);
-                    ResultSet rs = ps.executeQuery();
+            String sql = "SELECT * FROM customers WHERE customer_id = ?";
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setInt(1, currentCustomerId);
+                try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        FNameField.setText(rs.getString("first_name"));
+                        FNameFIeld.setText(rs.getString("first_name"));
                         LNameField.setText(rs.getString("last_name"));
                         PNumField.setText(rs.getString("phone_number"));
                         emailField.setText(rs.getString("email"));
-                        FNameField.setEditable(false);
+                        FNameFIeld.setEditable(false);
                         LNameField.setEditable(false);
                         PNumField.setEditable(true);
                         emailField.setEditable(true);
                     }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
                 }
-                searchDialog.dispose();
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Error loading customer: " + ex.getMessage());
             }
+            searchDialog.dispose();
         });
-
-        // Auto-search on enter
-        txtSearch.addActionListener(e -> btnSearch.doClick());
 
         searchDialog.setVisible(true);
     }
