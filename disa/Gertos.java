@@ -1,5 +1,6 @@
+package disa;
 
-public class gertos {
+public class Gertos {
     public static void main(String[] args) {
     	
         System.out.println("Full Name: Joshua Miguel Gertos");
