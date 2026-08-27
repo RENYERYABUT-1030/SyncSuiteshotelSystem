@@ -20,7 +20,6 @@ import java.util.Calendar;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -52,8 +51,10 @@ public class NewBookingPanel extends JPanel {
     private JLabel roomImageLabel;
     private JLabel roomNameLabel;
     private JSpinner guestCountSpinner;
-    private JCheckBox chckbxSeniorPwd;
+    private JSpinner childCountSpinner;
+    private JSpinner seniorPwdCountSpinner;
     private JLabel lblExtraCharge;
+    private JLabel lblDiscountNote;
 
     private int currentCustomerId = -1;
 
@@ -133,36 +134,41 @@ public class NewBookingPanel extends JPanel {
         lblGuestCount.setBounds(193, 401, 121, 17);
         this.add(lblGuestCount);
 
+        JLabel lblChildCount = new JLabel("No. of Children (Free):");
+        lblChildCount.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblChildCount.setBounds(193, 428, 160, 17);
+        this.add(lblChildCount);
+
         JLabel lbldates = new JLabel("--Dates");
         lbldates.setForeground(new Color(0, 0, 68));
         lbldates.setFont(new Font("SansSerif", Font.BOLD, 18));
-        lbldates.setBounds(101, 428, 214, 17);
+        lbldates.setBounds(101, 468, 214, 17);
         this.add(lbldates);
 
         JLabel lblCheck = new JLabel("Check-in Date");
         lblCheck.setFont(new Font("SansSerif", Font.BOLD, 14));
-        lblCheck.setBounds(193, 455, 121, 17);
+        lblCheck.setBounds(193, 495, 121, 17);
         this.add(lblCheck);
 
         JLabel lblCheckoutDate = new JLabel("Check-out Date");
         lblCheckoutDate.setFont(new Font("SansSerif", Font.BOLD, 14));
-        lblCheckoutDate.setBounds(193, 501, 128, 17);
+        lblCheckoutDate.setBounds(193, 541, 128, 17);
         this.add(lblCheckoutDate);
 
         JLabel lblNewLabel = new JLabel("Payment");
         lblNewLabel.setForeground(new Color(0, 0, 68));
         lblNewLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
-        lblNewLabel.setBounds(101, 540, 214, 17);
+        lblNewLabel.setBounds(101, 580, 214, 17);
         this.add(lblNewLabel);
 
         JLabel lblPaymentMethod = new JLabel("Payment Method");
         lblPaymentMethod.setFont(new Font("SansSerif", Font.BOLD, 14));
-        lblPaymentMethod.setBounds(193, 610, 147, 17);
+        lblPaymentMethod.setBounds(193, 650, 147, 17);
         this.add(lblPaymentMethod);
 
         JLabel lblCheckOut = new JLabel("Total Amount");
         lblCheckOut.setFont(new Font("SansSerif", Font.BOLD, 14));
-        lblCheckOut.setBounds(193, 648, 121, 17);
+        lblCheckOut.setBounds(193, 688, 121, 17);
         this.add(lblCheckOut);
 
         LNameField = new JTextField();
@@ -246,7 +252,10 @@ public class NewBookingPanel extends JPanel {
 
         guestCountSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 20, 1));
         guestCountSpinner.setBounds(334, 401, 74, 22);
-        guestCountSpinner.addChangeListener(e -> calculateTotalAmount());
+        guestCountSpinner.addChangeListener(e -> {
+            clampDiscountSpinners();
+            calculateTotalAmount();
+        });
         this.add(guestCountSpinner);
 
         lblExtraCharge = new JLabel("");
@@ -254,6 +263,14 @@ public class NewBookingPanel extends JPanel {
         lblExtraCharge.setForeground(new Color(224, 27, 36));
         lblExtraCharge.setBounds(416, 401, 258, 22);
         this.add(lblExtraCharge);
+
+        childCountSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
+        childCountSpinner.setBounds(363, 425, 74, 22);
+        childCountSpinner.addChangeListener(e -> {
+            clampDiscountSpinners();
+            calculateTotalAmount();
+        });
+        this.add(childCountSpinner);
 
         Calendar today = Calendar.getInstance();
         today.set(Calendar.HOUR_OF_DAY, 0);
@@ -266,12 +283,12 @@ public class NewBookingPanel extends JPanel {
         SpinnerDateModel checkOutModel = new SpinnerDateModel(minDate, minDate, null, Calendar.DAY_OF_MONTH);
 
         checkInSpinner = new JSpinner(checkInModel);
-        checkInSpinner.setBounds(331, 455, 241, 22);
+        checkInSpinner.setBounds(331, 495, 241, 22);
         checkInSpinner.setEditor(new JSpinner.DateEditor(checkInSpinner, "yyyy-MM-dd"));
         this.add(checkInSpinner);
 
         checkOutSPinner = new JSpinner(checkOutModel);
-        checkOutSPinner.setBounds(331, 501, 241, 22);
+        checkOutSPinner.setBounds(331, 541, 241, 22);
         checkOutSPinner.setEditor(new JSpinner.DateEditor(checkOutSPinner, "yyyy-MM-dd"));
         this.add(checkOutSPinner);
 
@@ -285,14 +302,14 @@ public class NewBookingPanel extends JPanel {
         });
 
         txtTotalAmount = new JTextField();
-        txtTotalAmount.setBounds(331, 648, 241, 21);
+        txtTotalAmount.setBounds(331, 688, 241, 21);
         txtTotalAmount.setEditable(false);
         txtTotalAmount.setFont(new Font("SansSerif", Font.BOLD, 14));
         this.add(txtTotalAmount);
 
         String[] paymentMethods = {"Cash", "GCash/QR Scan"};
         PMethodCBX = new JComboBox<>(paymentMethods);
-        PMethodCBX.setBounds(331, 607, 241, 26);
+        PMethodCBX.setBounds(331, 647, 241, 26);
         this.add(PMethodCBX);
 
         JButton btnClearForm = new JButton("Clear Form");
@@ -300,7 +317,7 @@ public class NewBookingPanel extends JPanel {
         btnClearForm.setForeground(Color.WHITE);
         btnClearForm.setBackground(new Color(224, 27, 36));
         btnClearForm.setFont(new Font("SansSerif", Font.BOLD, 14));
-        btnClearForm.setBounds(1198, 743, 140, 27);
+        btnClearForm.setBounds(1198, 783, 140, 27);
         this.add(btnClearForm);
 
         JButton btnSaveBooking = new JButton("Save Booking");
@@ -308,17 +325,26 @@ public class NewBookingPanel extends JPanel {
         btnSaveBooking.setForeground(Color.WHITE);
         btnSaveBooking.setBackground(new Color(46, 194, 126));
         btnSaveBooking.setFont(new Font("SansSerif", Font.BOLD, 14));
-        btnSaveBooking.setBounds(1358, 743, 140, 27);
+        btnSaveBooking.setBounds(1358, 783, 140, 27);
         this.add(btnSaveBooking);
 
-        chckbxSeniorPwd = new JCheckBox("Senior / PWD");
-        chckbxSeniorPwd.addActionListener(e -> calculateTotalAmount());
-        chckbxSeniorPwd.setBounds(331, 565, 129, 23);
-        this.add(chckbxSeniorPwd);
+        seniorPwdCountSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
+        seniorPwdCountSpinner.setBounds(331, 604, 74, 22);
+        seniorPwdCountSpinner.addChangeListener(e -> {
+            clampDiscountSpinners();
+            calculateTotalAmount();
+        });
+        this.add(seniorPwdCountSpinner);
 
-        JLabel lblDiscount = new JLabel("Discount");
+        lblDiscountNote = new JLabel("");
+        lblDiscountNote.setFont(new Font("SansSerif", Font.ITALIC, 12));
+        lblDiscountNote.setForeground(new Color(224, 27, 36));
+        lblDiscountNote.setBounds(416, 604, 258, 22);
+        this.add(lblDiscountNote);
+
+        JLabel lblDiscount = new JLabel("No. of Senior/PWD:");
         lblDiscount.setFont(new Font("SansSerif", Font.BOLD, 14));
-        lblDiscount.setBounds(193, 567, 115, 15);
+        lblDiscount.setBounds(193, 607, 145, 15);
         this.add(lblDiscount);
 
         loadAvailableRooms();
@@ -370,15 +396,21 @@ public class NewBookingPanel extends JPanel {
             if (days <= 0L) {
                 txtTotalAmount.setText("Invalid Dates");
                 lblExtraCharge.setText("");
+                lblDiscountNote.setText("");
                 return;
             }
 
             int typeIndex = roomTypeCBX.getSelectedIndex();
-            int actualGuests = (Integer) guestCountSpinner.getValue();
+            int totalGuests = (Integer) guestCountSpinner.getValue();
+            int childCount = (Integer) childCountSpinner.getValue();
+            int seniorPwdCount = (Integer) seniorPwdCountSpinner.getValue();
             int allowedBaseGuests = INCLUDED_GUESTS[typeIndex];
 
+            // Children are free: they don't count towards the billable/extra-guest headcount.
+            int billableGuests = Math.max(0, totalGuests - childCount);
+
             double total = days * BASE_PRICES[typeIndex];
-            int extraGuests = Math.max(0, actualGuests - allowedBaseGuests);
+            int extraGuests = Math.max(0, billableGuests - allowedBaseGuests);
             double extraChargeTotal = extraGuests * EXTRA_GUEST_FEE[typeIndex] * days;
 
             if (extraGuests > 0) {
@@ -388,10 +420,35 @@ public class NewBookingPanel extends JPanel {
             }
 
             total += extraChargeTotal;
-            total = applyDiscount(total);
+
+            double discount = computeSeniorPwdDiscount(total, seniorPwdCount, totalGuests);
+            if (discount > 0) {
+                lblDiscountNote.setText(String.format("(- \u20b1%,.2f for %d Senior/PWD)", discount, seniorPwdCount));
+            } else {
+                lblDiscountNote.setText("");
+            }
+            total -= discount;
+
             txtTotalAmount.setText("\u20b1" + String.format("%,.2f", total));
         } catch (Exception e) {
             txtTotalAmount.setText("Error");
+        }
+    }
+
+    /** Keeps children + Senior/PWD counts from exceeding the total number of guests. */
+    private void clampDiscountSpinners() {
+        int totalGuests = (Integer) guestCountSpinner.getValue();
+
+        int childCount = (Integer) childCountSpinner.getValue();
+        if (childCount > totalGuests) {
+            childCountSpinner.setValue(totalGuests);
+            childCount = totalGuests;
+        }
+
+        int seniorPwdCount = (Integer) seniorPwdCountSpinner.getValue();
+        int maxSeniorPwd = Math.max(0, totalGuests - childCount);
+        if (seniorPwdCount > maxSeniorPwd) {
+            seniorPwdCountSpinner.setValue(maxSeniorPwd);
         }
     }
 
@@ -430,8 +487,10 @@ public class NewBookingPanel extends JPanel {
         roomImageLabel.setIcon(null);
         roomNameLabel.setText("");
         guestCountSpinner.setValue(1);
-        chckbxSeniorPwd.setSelected(false);
+        childCountSpinner.setValue(0);
+        seniorPwdCountSpinner.setValue(0);
         lblExtraCharge.setText("");
+        lblDiscountNote.setText("");
         currentCustomerId = -1;
         FNameFIeld.setEditable(true);
         LNameField.setEditable(true);
@@ -497,13 +556,26 @@ public class NewBookingPanel extends JPanel {
         calOut.set(Calendar.MILLISECOND, 0);
 
         int typeIndex = roomTypeCBX.getSelectedIndex();
-        int actualGuests = (Integer) guestCountSpinner.getValue();
+        int totalGuests = (Integer) guestCountSpinner.getValue();
+        int childCount = (Integer) childCountSpinner.getValue();
+        int seniorPwdCount = (Integer) seniorPwdCountSpinner.getValue();
+
+        if (childCount + seniorPwdCount > totalGuests) {
+            JOptionPane.showMessageDialog(this,
+                    "No. of Children + No. of Senior/PWD cannot exceed the total No. of Guests.",
+                    "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         int allowedBaseGuests = INCLUDED_GUESTS[typeIndex];
-        int extraGuests = Math.max(0, actualGuests - allowedBaseGuests);
+        int billableGuests = Math.max(0, totalGuests - childCount);
+        int extraGuests = Math.max(0, billableGuests - allowedBaseGuests);
 
         double baseTotal = BASE_PRICES[typeIndex] * days;
         double extraChargeTotal = extraGuests * EXTRA_GUEST_FEE[typeIndex] * days;
-        double total = applyDiscount(baseTotal + extraChargeTotal);
+        double subTotal = baseTotal + extraChargeTotal;
+        double discount = computeSeniorPwdDiscount(subTotal, seniorPwdCount, totalGuests);
+        double total = subTotal - discount;
 
         Date sqlCheckIn = new Date(calIn.getTimeInMillis());
         Date sqlCheckOut = new Date(calOut.getTimeInMillis());
@@ -634,11 +706,19 @@ public class NewBookingPanel extends JPanel {
         return new ImageIcon(newImg);
     }
 
-    private double applyDiscount(double subTotal) {
-        if (chckbxSeniorPwd.isSelected()) {
-            return subTotal - subTotal * 0.2;
+    /**
+     * Senior Citizen / PWD discount (RA 9994 / RA 10754) applies only to the portion of the
+     * bill attributable to each qualifying guest, not the whole booking. We approximate each
+     * guest's share as an equal split of the total across all guests in the room, then give a
+     * 20% discount on the share belonging to Senior/PWD guests.
+     */
+    private double computeSeniorPwdDiscount(double subTotal, int seniorPwdCount, int totalGuests) {
+        if (seniorPwdCount <= 0 || totalGuests <= 0) {
+            return 0.0;
         }
-        return subTotal;
+        int cappedCount = Math.min(seniorPwdCount, totalGuests);
+        double perGuestShare = subTotal / totalGuests;
+        return perGuestShare * cappedCount * 0.20;
     }
 
     private void showCustomerSearchDialog() {
