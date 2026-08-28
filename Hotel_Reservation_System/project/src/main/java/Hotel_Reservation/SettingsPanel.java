@@ -36,6 +36,7 @@ public class SettingsPanel extends JPanel {
     private JTextField txtSmtpUsername;
     private JPasswordField txtSmtpPassword;
     private JLabel lblEmailStatus;
+    private JLabel lblMailLibStatus;
 
     // SMS settings
     private JPasswordField txtSmsApiKey;
@@ -271,8 +272,20 @@ public class SettingsPanel extends JPanel {
         JLabel sub = new JLabel("Used when sending receipts via email from Reports.");
         sub.setFont(new Font("SansSerif", Font.PLAIN, 11));
         sub.setForeground(new Color(150, 150, 150));
-        sub.setBorder(new EmptyBorder(2, 0, 15, 0));
+        sub.setBorder(new EmptyBorder(2, 0, 8, 0));
         card.add(sub);
+
+        // FIX: Previously there was NO way to tell, from the UI, whether the
+        // JavaMail/Activation jars were actually visible to the running app.
+        // "I added the jar but email still doesn't work" is almost always
+        // this — the jar is in the IDE build path but not on the classpath
+        // that actually runs. This label shows the live, real reason.
+        lblMailLibStatus = new JLabel(" ");
+        lblMailLibStatus.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        lblMailLibStatus.setBorder(new EmptyBorder(0, 0, 15, 0));
+        lblMailLibStatus.setAlignmentX(Component.LEFT_ALIGNMENT);
+        refreshMailLibStatus();
+        card.add(lblMailLibStatus);
 
         card.add(fieldLabel("SMTP Host (e.g. smtp.gmail.com)"));
         txtSmtpHost = new JTextField();
@@ -298,14 +311,32 @@ public class SettingsPanel extends JPanel {
         card.add(txtSmtpPassword);
         card.add(Box.createVerticalStrut(15));
 
+        JPanel emailBtnRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        emailBtnRow.setOpaque(false);
+        emailBtnRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+        emailBtnRow.setMaximumSize(new Dimension(500, 40));
+
         JButton btnSaveEmail = new JButton("Save Email Settings");
-        btnSaveEmail.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnSaveEmail.setBackground(new Color(70, 130, 180));
         btnSaveEmail.setForeground(Color.WHITE);
         btnSaveEmail.setFont(new Font("SansSerif", Font.BOLD, 13));
         btnSaveEmail.setFocusPainted(false);
         btnSaveEmail.addActionListener(e -> saveEmailSettings());
-        card.add(btnSaveEmail);
+        emailBtnRow.add(btnSaveEmail);
+
+        // FIX: New — lets the admin verify SMTP host/port/credentials
+        // actually work *before* a guest gets a failed-email error, and
+        // reports the real underlying reason (bad app password, wrong
+        // port, host unreachable, etc.) instead of a generic failure.
+        JButton btnTestEmail = new JButton("🔌 Test Connection");
+        btnTestEmail.setBackground(new Color(46, 194, 126));
+        btnTestEmail.setForeground(Color.WHITE);
+        btnTestEmail.setFont(new Font("SansSerif", Font.BOLD, 13));
+        btnTestEmail.setFocusPainted(false);
+        btnTestEmail.addActionListener(e -> testEmailConnection());
+        emailBtnRow.add(btnTestEmail);
+
+        card.add(emailBtnRow);
         card.add(Box.createVerticalStrut(10));
 
         lblEmailStatus = new JLabel(" ");
@@ -344,6 +375,105 @@ public class SettingsPanel extends JPanel {
             lblEmailStatus.setForeground(new Color(224, 27, 36));
             lblEmailStatus.setText("Error: " + e.getMessage());
         }
+    }
+
+    /**
+     * Shows whether the JavaMail/Activation jars are actually visible to the
+     * running application, and — if not — exactly which class is missing.
+     * Delegates the actual check to ReportsPanel, which performs it once in
+     * a static initializer.
+     */
+    private void refreshMailLibStatus() {
+        if (Hotel_Reservation.ReportsPanel.isJavaMailAvailable()) {
+            lblMailLibStatus.setForeground(new Color(46, 194, 126));
+            lblMailLibStatus.setText("✅ Mail library detected on classpath.");
+        } else {
+            lblMailLibStatus.setForeground(new Color(224, 27, 36));
+            lblMailLibStatus.setText("<html><body style='width:440px'>❌ "
+                + Hotel_Reservation.ReportsPanel.getJavaMailStatusMessage() + "</body></html>");
+        }
+    }
+
+    /**
+     * Test the SMTP host/port/credentials currently in the form WITHOUT
+     * sending a real email — just opens and closes an authenticated SMTP
+     * connection via javax.mail.Transport, using reflection so this class
+     * still compiles even when mail.jar is absent.
+     *
+     * This is what actually answers "bakit hindi gumagana ang email" —
+     * it tells you whether the failure is (a) library missing, (b) wrong
+     * host/port, (c) bad username/app-password, or (d) network/firewall.
+     */
+    private void testEmailConnection() {
+        refreshMailLibStatus();
+
+        if (!Hotel_Reservation.ReportsPanel.isJavaMailAvailable()) {
+            JOptionPane.showMessageDialog(this,
+                "Can't test — the mail library isn't loaded.\n\n"
+                + Hotel_Reservation.ReportsPanel.getJavaMailStatusMessage(),
+                "Library Missing", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String host = txtSmtpHost.getText().trim();
+        String port = txtSmtpPort.getText().trim();
+        String username = txtSmtpUsername.getText().trim();
+        String password = new String(txtSmtpPassword.getPassword());
+
+        if (host.isEmpty() || port.isEmpty() || username.isEmpty() || password.isEmpty()) {
+            lblEmailStatus.setForeground(new Color(224, 27, 36));
+            lblEmailStatus.setText("Fill in host, port, username, and password before testing.");
+            return;
+        }
+
+        lblEmailStatus.setForeground(new Color(70, 130, 180));
+        lblEmailStatus.setText("Testing connection...");
+
+        // Run off the EDT so the UI doesn't freeze while connecting.
+        new Thread(() -> {
+            String resultText;
+            Color resultColor;
+            try {
+                java.util.Properties props = new java.util.Properties();
+                props.setProperty("mail.smtp.auth", "true");
+                props.setProperty("mail.smtp.starttls.enable", "true");
+                props.setProperty("mail.smtp.host", host);
+                props.setProperty("mail.smtp.port", port);
+                // Reasonable timeouts so a blocked port fails fast instead of hanging.
+                props.setProperty("mail.smtp.connectiontimeout", "8000");
+                props.setProperty("mail.smtp.timeout", "8000");
+
+                Class<?> sessionClass = Class.forName("javax.mail.Session");
+                Class<?> transportClass = Class.forName("javax.mail.Transport");
+
+                Object session = sessionClass.getMethod("getInstance", java.util.Properties.class)
+                                              .invoke(null, props);
+                Object transport = sessionClass.getMethod("getTransport", String.class)
+                                                .invoke(session, "smtp");
+
+                transportClass.getMethod("connect", String.class, String.class, String.class)
+                              .invoke(transport, host, username, password);
+                transportClass.getMethod("close").invoke(transport);
+
+                resultText = "✅ Connected and authenticated successfully!";
+                resultColor = new Color(46, 194, 126);
+            } catch (Exception ex) {
+                Throwable cause = ex;
+                while (cause.getCause() != null && cause.getCause() != cause) {
+                    cause = cause.getCause();
+                }
+                resultText = "❌ Connection failed: "
+                    + (cause.getMessage() != null ? cause.getMessage() : cause.toString());
+                resultColor = new Color(224, 27, 36);
+            }
+
+            final String finalText = resultText;
+            final Color finalColor = resultColor;
+            SwingUtilities.invokeLater(() -> {
+                lblEmailStatus.setForeground(finalColor);
+                lblEmailStatus.setText(finalText);
+            });
+        }).start();
     }
 
     // ─────────────────────────────────────────────────────────

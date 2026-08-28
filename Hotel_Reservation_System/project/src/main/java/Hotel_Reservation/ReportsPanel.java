@@ -57,15 +57,44 @@ public class ReportsPanel extends JPanel {
     private JTabbedPane tabbedPane;
 
     // Track if JavaMail is available
+    // FIX: The old check only tested javax.mail.Message and swallowed the
+    // real reason for failure. Email attachments also need javax.activation
+    // (JAF), which was removed from the JDK in Java 9+ and must be added as
+    // its own jar (activation.jar / jakarta.activation) separately from
+    // mail.jar. If either class is missing, or if the wrong artifact was
+    // added (e.g. "jakarta.mail" instead of "javax.mail" — different package
+    // names), Class.forName silently fails here with no visible error unless
+    // you check System.err or console output. We now capture *which* class
+    // was missing so Settings/Reports can show the real reason instead of a
+    // generic "not available" message.
     private static boolean javaMailAvailable = false;
+    private static String javaMailStatusMessage = "Not checked yet.";
     static {
         try {
             Class.forName("javax.mail.Message");
+            Class.forName("javax.mail.internet.MimeMessage");
+            Class.forName("javax.mail.Transport");
+            Class.forName("javax.activation.DataHandler");
             javaMailAvailable = true;
+            javaMailStatusMessage = "JavaMail + Activation libraries detected on the classpath.";
         } catch (ClassNotFoundException e) {
             javaMailAvailable = false;
-            System.err.println("JavaMail not found. Email features will be disabled.");
+            javaMailStatusMessage = "Missing class: " + e.getMessage()
+                + ". Make sure mail.jar (javax.mail, NOT jakarta.mail) and "
+                + "activation.jar are both on the RUN classpath — adding them "
+                + "to the IDE build path is not enough if your run/export "
+                + "configuration doesn't include them.";
+            System.err.println("JavaMail not found. Email features will be disabled. Reason: " + e.getMessage());
         }
+    }
+
+    /** Lets other panels (e.g. SettingsPanel) show the real email-library status. */
+    public static boolean isJavaMailAvailable() {
+        return javaMailAvailable;
+    }
+
+    public static String getJavaMailStatusMessage() {
+        return javaMailStatusMessage;
     }
 
     public ReportsPanel() {
@@ -639,10 +668,15 @@ public class ReportsPanel extends JPanel {
      * FIX: Made email optional - shows warning if JavaMail not available
      */
     private void sendReceiptEmail(int bookingId, String email, String customMessage) {
-        // FIX: Check if JavaMail is available
+        // FIX: Check if JavaMail is available, and show the SPECIFIC reason
+        // (which class is missing) instead of a generic message, so it's
+        // actually possible to diagnose "I added the jars but it still
+        // doesn't work" — usually a run/export classpath issue, not a
+        // missing jar in the IDE build path.
         if (!javaMailAvailable) {
-            JOptionPane.showMessageDialog(this, 
-                "Email feature is not available.\nPlease add mail.jar and activation.jar to your project.", 
+            JOptionPane.showMessageDialog(this,
+                "Email feature is not available.\n\n" + javaMailStatusMessage
+                + "\n\nCheck Settings \u2192 Email Settings for a live library status check.",
                 "Email Unavailable", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -742,11 +776,25 @@ public class ReportsPanel extends JPanel {
                 "Action: Verify database is running and accessible",
                 "Database Error", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
+            // FIX: sendEmailViaReflection() calls javax.mail methods via
+            // reflection, so real failures (bad credentials, host unreachable,
+            // etc.) arrive wrapped in java.lang.reflect.InvocationTargetException
+            // whose own getMessage() is usually null. Unwrap to the actual
+            // cause so the dialog shows something actionable instead of
+            // "Details: null".
+            Throwable cause = e;
+            while (cause.getCause() != null && cause.getCause() != cause) {
+                cause = cause.getCause();
+            }
+            String detail = cause.getMessage() != null ? cause.getMessage() : cause.toString();
+
             JOptionPane.showMessageDialog(this, 
                 "ERROR CODE 006 - Email Sending Failed\n" +
                 "Description: Could not send receipt email\n" +
-                "Details: " + e.getMessage() + "\n" +
-                "Action: Verify email settings, recipient address, and internet connection",
+                "Details: " + detail + "\n" +
+                "Action: Verify SMTP host/port, that the account allows SMTP\n" +
+                "(Gmail needs an App Password, not your normal password), and\n" +
+                "that this device's internet/firewall allows outbound SMTP.",
                 "Email Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }

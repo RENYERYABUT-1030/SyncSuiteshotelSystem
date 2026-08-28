@@ -74,10 +74,10 @@ public class ConfigManager {
         props.setProperty("qr.api.url", "https://api.qrserver.com");
 
         // Email Configuration
-        props.setProperty("email.smtp.host", "syncsuiteshotel@gmail.com");
+        props.setProperty("email.smtp.host", "smtp.gmail.com");
         props.setProperty("email.smtp.port", "587");
         props.setProperty("email.from", "syncsuiteshotel@gmail.com");
-        props.setProperty("email.enabled", "xisl dwds aeyt ixot");
+        props.setProperty("email.enabled", "fokc zhcu wtlg sfyo");
 
         // UI Configuration
         props.setProperty("ui.theme", "dark");
