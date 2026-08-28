@@ -47,7 +47,7 @@ public class ConfigManager {
 
     private void loadDefaults() {
         // Database Defaults
-        props.setProperty("db.url", "jdbc:mysql://localhost:3306/hotel_system");
+        props.setProperty("db.url", "jdbc:mysql://localhost:3306/hotel_system_schema");
         props.setProperty("db.username", "root");
         props.setProperty("db.password", "");
         props.setProperty("db.pool.size", "20");
