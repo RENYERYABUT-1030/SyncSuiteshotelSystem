@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: Hotel_Reservation.utils.SecurityUtilsTest
--------------------------------------------------------------------------------
-Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.465 s -- in Hotel_Reservation.utils.SecurityUtilsTest
